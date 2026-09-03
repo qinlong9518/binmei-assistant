@@ -1,0 +1,8 @@
+{
+  "versionCode": 6,
+  "versionName": "1.5",
+  "force": false,
+  "changelog": "1. 新增在线更新功能\n2. 设置页检查更新\n3. 启动静默检查新版本\n4. 多源下载加速与自动安装",
+  "apkUrl": "https://github.com/qinlong9518/binmei-assistant/releases/download/v1.5/app-release.apk",
+  "apkFile": "app-release.apk"
+}
