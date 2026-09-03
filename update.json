@@ -1,8 +1,1 @@
-{
-  "versionCode": 7,
-  "versionName": "1.5.1",
-  "force": false,
-  "changelog": "1. 修复检查更新网络不可达\n2. 新增国内镜像源，免翻墙直连",
-  "apkUrl": "https://github.com/qinlong9518/binmei-assistant/releases/download/v1.5.1/app-release.apk",
-  "apkFile": "app-release.apk"
-}
+{"versionCode":8,"versionName":"1.6","force":false,"changelog":"1. 标题始终居中不被挤偏\n2. 电源按钮下拉切换账号（最多5个+折叠）与退出登录\n3. 主界面直接切换账号并刷新积分","apkUrl":"https://github.com/qinlong9518/binmei-assistant/releases/download/v1.6/app-release.apk","apkFile":"app-release.apk"}
