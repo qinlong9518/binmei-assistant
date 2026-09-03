@@ -40,12 +40,17 @@ app/src/main/assets/
 
 ## 构建
 
+标准 Gradle Wrapper，任何装有 JDK 17 的环境克隆后直接构建：
+
 ```bash
-./gradlew assembleRelease
-# 产物: app/build/outputs/apk/release/app-release.apk
+./gradlew assembleRelease          # Linux/macOS（首次自动下载 Gradle 8.5）
+gradlew.bat assembleRelease        # Windows
+# 产物: app/build/outputs/apk/release/app-release.apk（debug 签名可直接安装）
 ```
 
-> ARM64 环境注意：`gradle.properties` 中 `android.aapt2FromMavenOverride` 指向本机 aapt2（PC 构建可删除该行）。
+- 需要 **JDK 17** 与网络（首次拉取 Android SDK 组件与依赖）
+- Android Studio：直接 Open 项目根目录，其余全自动
+- ARM64 手机端（proot）构建需本机 aapt2 适配，见 `gradle.properties` 注释技巧——常规环境无需任何额外配置
 
 ## 发版流程
 
