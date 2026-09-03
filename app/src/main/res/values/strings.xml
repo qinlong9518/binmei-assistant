@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">彬煤答题助手</string>
+    <string name="loading">加载中...</string>
+    <string name="points_title">今日积分</string>
+    <string name="points_total">总计</string>
+    <string name="points_unit">分</string>
+    <string name="points_please_login">请先登录</string>
+    <string name="points_loading">积分加载中...</string>
+    <string name="points_error">获取积分失败</string>
+    <string name="retry">重试</string>
+
+    <!-- 设置页 -->
+    <string name="settings_title">设置</string>
+    <string name="settings_subtitle">点击主界面标题栏文字可随时打开本页</string>
+    <string name="settings_group_engine">答题引擎</string>
+    <string name="settings_exam_poll">轮询速度</string>
+    <string name="settings_exam_poll_desc">答题主循环扫描间隔</string>
+    <string name="settings_answer_delay">答题后等待</string>
+    <string name="settings_answer_delay_desc">选中答案到点击下一题的延时</string>
+    <string name="settings_lock">动作锁定</string>
+    <string name="settings_lock_desc">答题后动作锁保持时长，防止重复作答</string>
+    <string name="settings_total_questions">总题数</string>
+    <string name="settings_total_questions_desc">答满该题数后触发交卷判断</string>
+    <string name="settings_auto_submit">自动交卷</string>
+    <string name="settings_auto_submit_desc">关闭后答满题数也不再自动交卷</string>
+    <string name="settings_group_points">积分监控</string>
+    <string name="settings_points_poll">积分轮询间隔</string>
+    <string name="settings_points_poll_desc">底部积分面板数据刷新频率</string>
+    <string name="btn_restore_default">恢复默认</string>
+    <string name="btn_save_apply">保存并应用</string>
+    <string name="toast_saved">设置已保存并应用</string>
+    <string name="toast_default">已恢复默认设置并应用</string>
+    <string name="fmt_ms">%1$d ms</string>
+    <string name="fmt_questions">%1$d 题</string>
+</resources>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="6dp"
+    android:paddingEnd="6dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
+    android:background="?attr/selectableItemBackground">
+
+    <!-- 任务名 + 分数 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/taskName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/on_background"
+            android:textSize="12sp"
+            tools:text="视频学习积分" />
+
+        <TextView
+            android:id="@+id/currentPoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/progress_fill"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="5" />
+
+        <TextView
+            android:id="@+id/maxPoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp"
+            android:layout_marginStart="1dp"
+            tools:text="/10分" />
+    </LinearLayout>
+
+    <!-- 进度条 -->
+    <ProgressBar
+        android:id="@+id/taskProgress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_marginTop="3dp"
+        android:max="100"
+        android:progressDrawable="@drawable/progress_bar_green"
+        tools:progress="50" />
+
+</LinearLayout>

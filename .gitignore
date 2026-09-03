@@ -1,0 +1,15 @@
+# Gradle
+.gradle/
+build/
+app/build/
+
+# IDE
+.idea/
+*.iml
+
+# 本机适配（PC 端 Android Studio 会自动重建）
+local.properties
+
+# 构建产物
+*.apk
+*.aab

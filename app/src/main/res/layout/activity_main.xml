@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+        <!-- 顶部标题栏（纯背景容器，高度代码动态=42dp+状态栏） -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:background="@color/primary"
+        android:elevation="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 标题：约束到父容器两端，绝对居中，不受右侧按钮影响；点击打开设置 -->
+    <TextView
+        android:id="@+id/toolbarTitle"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:text="@string/app_name"
+        android:textColor="@color/on_primary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="@id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 电源按钮：账号下拉切换 + 退出登录（topMargin 代码动态对齐可视区） -->
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/btnLogout"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="10dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="账号与退出登录"
+        android:src="@drawable/ic_power"
+        app:layout_constraintTop_toTopOf="@id/toolbar"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 主 WebView -->
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/pointsPanel" />
+
+    <!-- 加载进度条 -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:max="100"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:progress="40"
+        tools:visibility="visible" />
+
+    <!-- 积分底部面板 -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/pointsPanel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginBottom="6dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="3dp"
+        app:cardBackgroundColor="@color/points_card_bg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="9dp">
+
+            <!-- 标题行：今日积分 + 总计 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="5dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/points_title"
+                    android:textColor="@color/on_background"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/totalPointsLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/points_total"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/totalPointsValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:text="0"
+                    android:textColor="@color/points_total_value"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/points_unit"
+                    android:textColor="@color/points_total_value"
+                    android:textSize="11sp"
+                    android:layout_marginStart="1dp" />
+            </LinearLayout>
+
+            <!-- 分割线 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider"
+                android:layout_marginBottom="5dp" />
+
+            <!-- 积分列表 -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/pointsRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxHeight="90dp"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_points" />
+
+            <!-- 空状态 / 错误提示 -->
+            <TextView
+                android:id="@+id/pointsStatusText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/points_loading"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

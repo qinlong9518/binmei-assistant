@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.BM365WebView" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/surface</item>
+    </style>
+
+    <!-- 设置页：绿色主题（滑块/开关/按钮跟随 colorPrimary） -->
+    <style name="Theme.BM365Settings" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary_green</item>
+        <item name="colorPrimaryVariant">@color/primary_green_dark</item>
+        <item name="colorAccent">@color/primary_green</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/surface</item>
+    </style>
+</resources>
