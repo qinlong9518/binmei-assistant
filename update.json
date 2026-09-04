@@ -1,8 +1,8 @@
 {
-  "versionCode": 10,
-  "versionName": "1.6.2",
+  "versionCode": 11,
+  "versionName": "1.6.3",
   "force": false,
-  "changelog": "1. 修复标题被状态栏遮挡一半：标题栏内容改用系统 insets 精确对齐状态栏以下可视区（兼容刘海屏/异形屏）\n2. 电源按钮位置同步精准对齐",
-  "apkUrl": "https://github.com/qinlong9518/binmei-assistant/releases/download/v1.6.2/app-release.apk",
+  "changelog": "1. 新增自动开考：今日积分不足24分时自动进入手机考试并开始试卷二，答题脚本自动作答\n2. 轮询5.5秒，与积分轮询错峰\n3. 修复标题状态栏遮挡（v1.6.2）",
+  "apkUrl": "https://github.com/qinlong9518/binmei-assistant/releases/download/v1.6.3/app-release.apk",
   "apkFile": "app-release.apk"
 }
