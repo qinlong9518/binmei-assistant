@@ -95,7 +95,7 @@ class LoginActivity : AppCompatActivity() {
                 btnLogin.isEnabled = true
                 btnLogin.text = "登  录"
                 if (result.success) {
-                    accountManager.onLoginSuccess(account)
+                    accountManager.onLoginSuccess(account, result.name)
                     Toast.makeText(this, "登录成功", Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this, MainActivity::class.java))
                     finish()
