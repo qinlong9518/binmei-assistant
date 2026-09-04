@@ -12,6 +12,7 @@ import android.content.SharedPreferences
  * @param pointsPollMs   积分轮询间隔（1000–60000ms）
  * @param totalQuestions 总题数（自动交卷阈值，1–200）
  * @param autoSubmit     自动交卷开关
+ * @param autoQuestionCount 自动题数开关：开启时按试卷下发数量作答，totalQuestions 失效
  */
 data class BmConfig(
     val examPollMs: Int = DEFAULT.examPollMs,
@@ -19,7 +20,8 @@ data class BmConfig(
     val lockMs: Int = DEFAULT.lockMs,
     val pointsPollMs: Int = DEFAULT.pointsPollMs,
     val totalQuestions: Int = DEFAULT.totalQuestions,
-    val autoSubmit: Boolean = DEFAULT.autoSubmit
+    val autoSubmit: Boolean = DEFAULT.autoSubmit,
+    val autoQuestionCount: Boolean = DEFAULT.autoQuestionCount
 ) {
 
     /** 序列化为注入 JS 的 window.BM_CFG 对象字面量（无引号包裹，可直接 eval） */
@@ -29,7 +31,8 @@ data class BmConfig(
         ",\"lockMs\":$lockMs" +
         ",\"pointsPollMs\":$pointsPollMs" +
         ",\"totalQuestions\":$totalQuestions" +
-        ",\"autoSubmit\":$autoSubmit}"
+        ",\"autoSubmit\":$autoSubmit" +
+        ",\"autoQuestionCount\":$autoQuestionCount}"
 
     companion object {
         /** 全部默认值（"恢复默认"按钮的目标状态） */
@@ -39,7 +42,8 @@ data class BmConfig(
             lockMs = 80,
             pointsPollMs = 5000,
             totalQuestions = 40,
-            autoSubmit = true
+            autoSubmit = true,
+            autoQuestionCount = false
         )
 
         // 取值范围（与设置页滑块范围一致）
@@ -56,14 +60,16 @@ data class BmConfig(
             lockMs: Int,
             pointsPollMs: Int,
             totalQuestions: Int,
-            autoSubmit: Boolean
+            autoSubmit: Boolean,
+            autoQuestionCount: Boolean = false
         ): BmConfig = BmConfig(
             examPollMs = examPollMs.coerceIn(RANGE_EXAM_POLL.first.toInt(), RANGE_EXAM_POLL.last.toInt()),
             answerDelayMs = answerDelayMs.coerceIn(RANGE_ANSWER_DELAY.first.toInt(), RANGE_ANSWER_DELAY.last.toInt()),
             lockMs = lockMs.coerceIn(RANGE_LOCK.first.toInt(), RANGE_LOCK.last.toInt()),
             pointsPollMs = pointsPollMs.coerceIn(RANGE_POINTS_POLL.first.toInt(), RANGE_POINTS_POLL.last.toInt()),
             totalQuestions = totalQuestions.coerceIn(RANGE_TOTAL_QUESTIONS.first.toInt(), RANGE_TOTAL_QUESTIONS.last.toInt()),
-            autoSubmit = autoSubmit
+            autoSubmit = autoSubmit,
+            autoQuestionCount = autoQuestionCount
         )
     }
 }
@@ -84,7 +90,8 @@ class BmSettings(context: Context) {
         lockMs = prefs.getInt(KEY_LOCK_MS, BmConfig.DEFAULT.lockMs),
         pointsPollMs = prefs.getInt(KEY_POINTS_POLL_MS, BmConfig.DEFAULT.pointsPollMs),
         totalQuestions = prefs.getInt(KEY_TOTAL_QUESTIONS, BmConfig.DEFAULT.totalQuestions),
-        autoSubmit = prefs.getBoolean(KEY_AUTO_SUBMIT, BmConfig.DEFAULT.autoSubmit)
+        autoSubmit = prefs.getBoolean(KEY_AUTO_SUBMIT, BmConfig.DEFAULT.autoSubmit),
+        autoQuestionCount = prefs.getBoolean(KEY_AUTO_QCOUNT, BmConfig.DEFAULT.autoQuestionCount)
     )
 
     /** 保存配置 */
@@ -96,6 +103,7 @@ class BmSettings(context: Context) {
             .putInt(KEY_POINTS_POLL_MS, cfg.pointsPollMs)
             .putInt(KEY_TOTAL_QUESTIONS, cfg.totalQuestions)
             .putBoolean(KEY_AUTO_SUBMIT, cfg.autoSubmit)
+            .putBoolean(KEY_AUTO_QCOUNT, cfg.autoQuestionCount)
             .apply()
     }
 
@@ -107,5 +115,6 @@ class BmSettings(context: Context) {
         const val KEY_POINTS_POLL_MS = "points_poll_ms"
         const val KEY_TOTAL_QUESTIONS = "total_questions"
         const val KEY_AUTO_SUBMIT = "auto_submit"
+        const val KEY_AUTO_QCOUNT = "auto_question_count"
     }
 }
