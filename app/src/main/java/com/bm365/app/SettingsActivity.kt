@@ -138,7 +138,16 @@ class SettingsActivity : AppCompatActivity() {
         binding.sliderTotalQuestions.value = cfg.totalQuestions.toFloat()
         binding.sliderPointsPoll.value = cfg.pointsPollMs.toFloat()
         binding.switchAutoSubmit.isChecked = cfg.autoSubmit
+        binding.switchAutoQCount.isChecked = cfg.autoQuestionCount
         refreshValueLabels()
+        updateTotalQuestionsEnabled()
+    }
+
+    /** 自动题数开关联动：开启时总题数滑块+数值置灰失效 */
+    private fun updateTotalQuestionsEnabled() {
+        val auto = binding.switchAutoQCount.isChecked
+        binding.sliderTotalQuestions.isEnabled = !auto
+        binding.valueTotalQuestions.alpha = if (auto) 0.4f else 1f
     }
 
     private fun setupListeners() {
@@ -147,6 +156,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.sliderLock.addOnChangeListener { _, _, _ -> refreshValueLabels() }
         binding.sliderTotalQuestions.addOnChangeListener { _, _, _ -> refreshValueLabels() }
         binding.sliderPointsPoll.addOnChangeListener { _, _, _ -> refreshValueLabels() }
+        binding.switchAutoQCount.setOnCheckedChangeListener { _, _ -> updateTotalQuestionsEnabled() }
 
         // 恢复默认：还原 6 项默认值并立即保存下发
         binding.btnRestoreDefault.setOnClickListener {
@@ -173,7 +183,8 @@ class SettingsActivity : AppCompatActivity() {
         lockMs = binding.sliderLock.value.toInt(),
         pointsPollMs = binding.sliderPointsPoll.value.toInt(),
         totalQuestions = binding.sliderTotalQuestions.value.toInt(),
-        autoSubmit = binding.switchAutoSubmit.isChecked
+        autoSubmit = binding.switchAutoSubmit.isChecked,
+        autoQuestionCount = binding.switchAutoQCount.isChecked
     )
 
     /** 通知 MainActivity 立即应用最新配置 */
