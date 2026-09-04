@@ -100,63 +100,12 @@
             android:orientation="vertical"
             android:padding="9dp">
 
-            <!-- 标题行：今日积分 + 总计 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="5dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/points_title"
-                    android:textColor="@color/on_background"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/totalPointsLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/points_total"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="11sp" />
-
-                <TextView
-                    android:id="@+id/totalPointsValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="3dp"
-                    android:text="0"
-                    android:textColor="@color/points_total_value"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/points_unit"
-                    android:textColor="@color/points_total_value"
-                    android:textSize="11sp"
-                    android:layout_marginStart="1dp" />
-            </LinearLayout>
-
-            <!-- 分割线 -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/divider"
-                android:layout_marginBottom="5dp" />
-
-            <!-- 积分列表 -->
+            <!-- 积分列表（两行 × 每行三项） -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/pointsRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxHeight="90dp"
+                android:maxHeight="70dp"
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_points" />
 
