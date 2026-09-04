@@ -160,7 +160,8 @@ class MainActivity : AppCompatActivity() {
         val current = accountManager.lastAccount() ?: ""
 
         val popup = PopupMenu(this, anchor)
-        val header = popup.menu.add(Menu.FIRST, 999999, Menu.NONE, "当前账号：$current")
+        // 显示人名（无姓名映射时回落显示账号）
+        val header = popup.menu.add(Menu.FIRST, 999999, Menu.NONE, "当前账号：${accountManager.displayName(current)}")
         header.isEnabled = false
         header.isCheckable = false
 
@@ -168,13 +169,13 @@ class MainActivity : AppCompatActivity() {
         val shown = accounts.take(5)
         val rest = accounts.drop(5)
         shown.forEach { acc ->
-            val item = popup.menu.add(0, acc.hashCode(), Menu.NONE, acc)
+            val item = popup.menu.add(0, acc.hashCode(), Menu.NONE, accountManager.displayName(acc))
             if (acc == current) item.setIcon(android.R.drawable.ic_menu_myplaces)
         }
         if (rest.isNotEmpty()) {
             val more = popup.menu.addSubMenu(0, MENU_MORE, Menu.NONE, "更多账号（${rest.size}）…")
             rest.forEach { acc ->
-                val item = more.add(0, acc.hashCode(), Menu.NONE, acc)
+                val item = more.add(0, acc.hashCode(), Menu.NONE, accountManager.displayName(acc))
                 if (acc == current) item.setIcon(android.R.drawable.ic_menu_myplaces)
             }
         }
@@ -189,11 +190,12 @@ class MainActivity : AppCompatActivity() {
                     confirmLogout()
                     true
                 }
-                MENU_MORE, MENU_NONE_ID -> false
+                MENU_MORE, MENU_NONE_ID, 999999 -> false
                 else -> {
-                    // 账号项：非当前账号才切换
-                    if (item.title?.toString() != current) {
-                        switchAccount(item.title?.toString() ?: "")
+                    // 菜单项显示的是人名，按 菜单ID=账号hashCode 反查真实账号再切换
+                    val acc = accounts.firstOrNull { it.hashCode() == item.itemId }
+                    if (acc != null && acc != current) {
+                        switchAccount(acc)
                     }
                     true
                 }
@@ -208,14 +210,15 @@ class MainActivity : AppCompatActivity() {
      */
     private fun switchAccount(account: String) {
         if (account.isBlank()) return
-        Toast.makeText(this, "正在切换到 $account ...", Toast.LENGTH_SHORT).show()
+        val am = BmAccountManager(this)
+        Toast.makeText(this, "正在切换到 ${am.displayName(account)} ...", Toast.LENGTH_SHORT).show()
         Thread {
             BmAccountManager.clearSiteCookies()
             val result = BmHttpLogin.login(account)
             runOnUiThread {
                 if (result.success) {
-                    BmAccountManager(this).onLoginSuccess(account)
-                    Toast.makeText(this, "已切换到 $account", Toast.LENGTH_SHORT).show()
+                    am.onLoginSuccess(account, result.name)
+                    Toast.makeText(this, "已切换到 ${am.displayName(account)}", Toast.LENGTH_SHORT).show()
                     // 双 WebView 重载为已登录主页
                     mainWebView.loadUrl(HOME_URL)
                     hiddenWebView.loadUrl(HOME_URL)
