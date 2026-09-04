@@ -1,8 +1,8 @@
 {
-  "versionCode": 16,
-  "versionName": "1.7.3",
+  "versionCode": 17,
+  "versionName": "1.7.4",
   "force": false,
-  "changelog": "1. 底部积分面板精简：移除今日积分/总计标题行，6 个积分项改为两行、每行三个",
-  "apkUrl": "https://github.com/qinlong9518/binmei-assistant/releases/download/v1.7.3/app-release.apk",
+  "changelog": "1. 答题引擎速度调节范围调整为10-100ms\n2. 积分轮询范围调整为1000-5000ms\n3. 新增自动答题轮询设置（1000-5000ms）",
+  "apkUrl": "https://github.com/qinlong9518/binmei-assistant/releases/download/v1.7.4/app-release.apk",
   "apkFile": "app-release.apk"
 }
