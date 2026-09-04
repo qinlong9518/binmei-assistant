@@ -12,8 +12,8 @@ android {
         // 仅支持 Android 15+（minSdk 35），无需兼容老设备
         minSdk = 35
         targetSdk = 34
-        versionCode = 12
-        versionName = "1.6.4"
+        versionCode = 13
+        versionName = "1.7.0"
     }
 
     buildTypes {
