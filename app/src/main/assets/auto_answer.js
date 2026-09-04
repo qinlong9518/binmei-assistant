@@ -17,13 +17,14 @@
     // 配置读取：原生注入 window.BM_CFG（全量替换），并派发 'bm-cfg' 事件
     // ==========================================
     if (!window.BM_CFG) {
-        window.BM_CFG = { examPollMs: 200, answerDelayMs: 50, lockMs: 80, pointsPollMs: 5000, totalQuestions: 40, autoSubmit: true, autoQuestionCount: false };
+        window.BM_CFG = { examPollMs: 50, answerDelayMs: 50, lockMs: 80, pointsPollMs: 5000, totalQuestions: 40, autoSubmit: true, autoQuestionCount: false, autoStartPollMs: 3000 };
     }
 
     function cfg() { return window.BM_CFG || {}; }
     function getPollMs() {
         var v = parseInt(cfg().examPollMs, 10);
-        return isNaN(v) ? 200 : v;
+        if (isNaN(v)) v = 50;
+        return Math.max(10, Math.min(100, v));
     }
     function getAnswerDelayMs() {
         var v = parseInt(cfg().answerDelayMs, 10);
