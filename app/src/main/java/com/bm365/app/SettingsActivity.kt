@@ -156,7 +156,16 @@ class SettingsActivity : AppCompatActivity() {
         binding.sliderLock.addOnChangeListener { _, _, _ -> refreshValueLabels() }
         binding.sliderTotalQuestions.addOnChangeListener { _, _, _ -> refreshValueLabels() }
         binding.sliderPointsPoll.addOnChangeListener { _, _, _ -> refreshValueLabels() }
-        binding.switchAutoQCount.setOnCheckedChangeListener { _, _ -> updateTotalQuestionsEnabled() }
+
+        // 开关类设置即时持久化（修复：开关打开后不按保存，重启丢失）
+        // 变更即写入 SharedPreferences；离开设置页时 MainActivity 收到结果并热下发新配置
+        binding.switchAutoQCount.setOnCheckedChangeListener { _, _ ->
+            updateTotalQuestionsEnabled()
+            persistNow()
+        }
+        binding.switchAutoSubmit.setOnCheckedChangeListener { _, _ ->
+            persistNow()
+        }
 
         // 恢复默认：还原 6 项默认值并立即保存下发
         binding.btnRestoreDefault.setOnClickListener {
@@ -190,6 +199,12 @@ class SettingsActivity : AppCompatActivity() {
     /** 通知 MainActivity 立即应用最新配置 */
     private fun pushResult() {
         setResult(RESULT_OK)
+    }
+
+    /** 开关变更即时保存（防止用户不按「保存并应用」直接返回导致设置丢失） */
+    private fun persistNow() {
+        settings.save(collectConfig())
+        pushResult()
     }
 
     private fun refreshValueLabels() {
