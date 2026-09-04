@@ -105,9 +105,11 @@ object BmUpdate {
         dir.listFiles()?.forEach { it.delete() }
         val dest = File(dir, meta.apkFile)
         val candidates = listOf(
-            meta.apkUrl,
+            // 国内镜像优先（实测 200，1~2s 内开始传输；github 直链在国内 DNS 下常挂起，放最后）
+            "https://ghfast.top/${meta.apkUrl}",
+            "https://ghproxy.net/${meta.apkUrl}",
             "https://gh-proxy.com/${meta.apkUrl}",
-            "https://mirror.ghproxy.com/${meta.apkUrl}"
+            meta.apkUrl
         )
         for (u in candidates) {
             try {
@@ -122,8 +124,10 @@ object BmUpdate {
         var conn: HttpURLConnection? = null
         return try {
             conn = (URL(url).openConnection() as HttpURLConnection).apply {
-                connectTimeout = 10000
-                readTimeout = 20000
+                // 注意：connectTimeout 不含 DNS 解析时间，被污染的域名会额外挂起；
+                // 因此超时收紧，且把国内可达性差的源排在候选末尾
+                connectTimeout = 5000
+                readTimeout = 15000
                 instanceFollowRedirects = true
                 setRequestProperty("User-Agent", "BM365App/1.0")
             }
