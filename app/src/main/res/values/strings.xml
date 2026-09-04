@@ -29,6 +29,8 @@
     <string name="settings_group_points">积分监控</string>
     <string name="settings_points_poll">积分轮询间隔</string>
     <string name="settings_points_poll_desc">底部积分面板数据刷新频率</string>
+    <string name="settings_autostart_poll">自动答题轮询</string>
+    <string name="settings_autostart_poll_desc">自动开考脚本的页面变化检测间隔</string>
     <string name="btn_restore_default">恢复默认</string>
     <string name="btn_save_apply">保存并应用</string>
     <string name="toast_saved">设置已保存并应用</string>
