@@ -1,10 +1,10 @@
-// 自动开考调度脚本 v2（积分明细分别判断）
-// 注入主 WebView，每 5.5s 轮询（错开积分 5s 轮询）：
-//   「手机考试」积分未满 → 自动进手机考试列表 → 点【试卷二】→ 答题引擎接管
-//   「模拟考试」积分未满 → 自动进模拟考试列表 → 点【试卷二】→ 答题引擎接管
-//   两项都满 → 静默
-// 数据依赖：原生层把积分明细写入 window.BM_EXAM_POINTS = {"手机考试":{"cur":N,"max":M}, "模拟考试":{...}}
-// 安全边界：考试页绝不干预（答题引擎负责）；冷却时间防重复；数据未就绪时不动
+// 自动开考调度脚本 v3（状态机 + 变化检测驱动，不再依赖固定冷却）
+// 注入主 WebView，每 3s 轮询：
+//   1) 读取当前状态快照（页面标题 / 考试列表 / 积分明细 / 考试页特征）
+//   2) 状态与上一轮相同 → 跳过；有变化 → 立即执行下一步动作
+//   3) 动作失败或无进展时按状态机重新决策，不会死等
+// 目标：手机考试/模拟考试积分未满 → 自动进对应列表 → 点【试卷二】→ 答题引擎接管
+// 门控：window.BM_AUTOSTART_DISABLED=true 时完全停用（进入软件的询问弹窗「暂不自动」）
 (function() {
     'use strict';
 
@@ -16,26 +16,25 @@
     }
     window.BM_AUTOSTART_INJECTED = true;
 
-    // ==========================================
-    // 参数
-    // ==========================================
-    var POLL_MS = 5500;          // 轮询间隔（错开积分 5s 轮询）
-    var TAB_BUSY_MS = 8000;      // 点 Tab 后冷却（等列表片段渲染）
-    var PAPER_BUSY_MS = 180000;  // 点试卷后长冷却（覆盖整场考试+交卷+回跳）
-    var MAX_TAB_TRIES = 3;       // Tab 连点上限（防未完成考试循环）
+    var POLL_MS = 3000;      // 轮询间隔：检测页面变化
+    var TAB_TRIES_LIMIT = 4; // 同一 Tab 连点上限（防异常循环）
 
-    var busyUntil = 0;
+    var lastSig = "";        // 上一轮状态签名
     var tabTries = 0;
+    var lastTabId = "";
 
     function log(m) { console.log("[自动开考] " + m); }
 
-    // 页面标题 → 考试类别（列表页片段有 mui-title；壳内首页无）
+    function isDisabled() {
+        try { return window.BM_AUTOSTART_DISABLED === true; } catch (e) { return false; }
+    }
+
+    // 页面标题（考试列表片段有 mui-title；壳内首页没有）
     function pageTitle() {
         var t = document.querySelector('.mui-bar-nav .mui-title');
         return t ? (t.textContent || "").trim() : "";
     }
 
-    // 列表页标题对应的积分明细键名
     function examKeyForPage() {
         var t = pageTitle();
         if (t.indexOf("手机考试") !== -1) return "手机考试";
@@ -43,41 +42,50 @@
         return "";
     }
 
-    // 当前页面的考试类别是否积分已满（数据缺失时视为已满=不操作）
-    function isCurrentPageExamFull() {
-        var key = examKeyForPage();
-        if (!key) return true;
-        try {
-            var d = window.BM_EXAM_POINTS || {};
-            var e = d[key];
-            if (!e || typeof e.cur !== "number" || typeof e.max !== "number") return true;
-            return e.cur >= e.max;
-        } catch (err) { return true; }
-    }
-
-    // 选出当前需要补分的考试类别：手机考试优先，其次模拟考试；null=全部已满/数据未就绪
+    // 当前需要补分的考试：手机考试优先 → 模拟考试；null=全满/数据未就绪
     function pickTarget() {
         try {
             var d = window.BM_EXAM_POINTS;
             if (!d || typeof d !== "object") return null;
-            var mobile = d["手机考试"], sim = d["模拟考试"];
-            // 明细存在且 cur/max 为数字才认为数据就绪；缺失视为已满（不误触发）
-            var mobileFull = !(mobile && typeof mobile.cur === "number") || mobile.cur >= (mobile.max || 0);
-            var simFull = !(sim && typeof sim.cur === "number") || sim.cur >= (sim.max || 0);
-            if (!mobileFull) return "手机考试";
-            if (!simFull) return "模拟考试";
+            var m = d["手机考试"], s = d["模拟考试"];
+            var mFull = !(m && typeof m.cur === "number") || m.cur >= (m.max || 0);
+            var sFull = !(s && typeof s.cur === "number") || s.cur >= (s.max || 0);
+            if (!mFull) return "手机考试";
+            if (!sFull) return "模拟考试";
             return null;
         } catch (e) { return null; }
     }
 
-    // 是否处于考试页环境（答题引擎的领域）
+    // 该考试积分是否已满（数据缺失视为已满=不操作）
+    function examFull(key) {
+        try {
+            var e = (window.BM_EXAM_POINTS || {})[key];
+            if (!e || typeof e.cur !== "number") return true;
+            return e.cur >= (e.max || 0);
+        } catch (err) { return true; }
+    }
+
     function inExamPage() {
         try {
             return !!(window.vData && window.onlineCur && window.allShiTi);
         } catch (e) { return false; }
     }
 
-    // 组合点击：mui tap 委托 + jQuery + 原生全覆盖
+    // 状态签名：任意要素变化即视为"页面有变化"
+    function snapshot() {
+        var lis = document.querySelectorAll('#canRunExamList > li.mui-table-view-cell');
+        var names = [];
+        for (var i = 0; i < lis.length; i++) names.push((lis[i].innerText || "").replace(/\s/g, ""));
+        try {
+            return [
+                pageTitle(),
+                inExamPage() ? ('exam:' + (window.onlineCur || '')) : 'page',
+                names.join('|'),
+                JSON.stringify(window.BM_EXAM_POINTS || {})
+            ].join('#');
+        } catch (e) { return String(Date.now()); }
+    }
+
     function fireTap(el) {
         if (!el) return;
         try {
@@ -104,77 +112,80 @@
 
     function tick() {
         try {
-            // 1. 考试页：答题引擎负责
-            if (inExamPage()) return;
+            if (isDisabled()) return;
+            if (inExamPage()) return; // 考试页归答题引擎
 
-            var now = Date.now();
-            if (now < busyUntil) return;
+            // 状态未变化：本轮跳过（3s 后再看）
+            var sig = snapshot();
+            if (sig === lastSig) return;
+            lastSig = sig;
 
-            // 2. 数据未就绪：静默等积分轮询刷出明细
             var target = pickTarget();
-            if (!target) return;
+            if (!target) return; // 全满或数据未就绪
 
             var page = pageTitle();
 
-            // 3. 处于某个考试列表页
+            // ---- 考试列表页 ----
             if (page !== "") {
-                if (examKeyForPage() === target && !isCurrentPageExamFull()) {
-                    // 当前列表页正是目标考试且未满 → 点试卷二
+                if (examKeyForPage() === target && !examFull(target)) {
                     var li = findPaperTwoLi();
                     if (li) {
                         log("[" + page + "] 积分未满，点击试卷二开考");
                         fireTap(li);
-                        busyUntil = now + PAPER_BUSY_MS;
-                        return;
                     }
-                    // 列表还没渲染出来：等下一轮
+                    // 没渲染出列表：等下一轮变化
                     return;
                 }
-                // 当前列表页不是目标（比如手机考试已满该去模拟考试）→ 点「学」回首页
+                // 页面与目标不符 → 回首页
                 var homeTab = document.getElementById('PersonMain');
                 if (homeTab) {
-                    log("[" + page + "] 与目标[" + target + "]不符，返回首页切换目标");
+                    log("[" + page + "] 与目标[" + target + "]不符，返回首页");
                     fireTap(homeTab);
-                    busyUntil = now + TAB_BUSY_MS;
                 }
                 return;
             }
 
-            // 4. 壳内首页 → 点底部 Tab 进入目标考试列表
+            // ---- 壳内首页 ----
             var tabId = (target === "手机考试") ? 'mainMobileExam' : 'mainSimulate';
             var tab = document.getElementById(tabId);
-            if (tab) {
-                if (tabTries >= MAX_TAB_TRIES) {
-                    log("连续点击 Tab " + tabTries + " 次未见列表，暂停 5 分钟（可能存在未完成考试）");
-                    busyUntil = now + 300000;
+            if (!tab) return;
+
+            // 同一 Tab 连点上限保护
+            if (tabId === lastTabId) {
+                tabTries++;
+                if (tabTries > TAB_TRIES_LIMIT) {
+                    log(tabId + " 连点 " + tabTries + " 次未见变化，暂停 5 分钟");
+                    lastSig = ""; // 强制下轮重新评估
                     tabTries = 0;
+                    lastTabId = "";
+                    busyPause();
                     return;
                 }
-                tabTries++;
-                log("[" + target + "] 积分未满，进入考试列表（第 " + tabTries + " 次）");
-                fireTap(tab);
-                busyUntil = now + TAB_BUSY_MS;
-                return;
+            } else {
+                lastTabId = tabId;
+                tabTries = 1;
             }
-
-            // 5. 其他页面（成绩页等无壳页面）：等待回壳
+            log("[" + target + "] 积分未满，进入考试列表（第 " + tabTries + " 次）");
+            fireTap(tab);
         } catch (e) {
             log("轮询异常: " + e);
         }
     }
 
+    var pausedUntil = 0;
+    function busyPause() { pausedUntil = Date.now() + 300000; }
+
     function loop() {
         setTimeout(function() {
-            tick();
+            if (Date.now() >= pausedUntil) tick();
             loop();
         }, POLL_MS);
     }
     loop();
 
-    // bm-cfg 热更新事件顺带触发一次
     document.addEventListener('bm-cfg', function() {
         setTimeout(tick, 0);
     });
 
-    log("已注入（v2：手机考试/模拟考试分别判断，轮询 " + POLL_MS + "ms）");
+    log("已注入（v3：状态检测驱动，轮询 " + POLL_MS + "ms）");
 })();
