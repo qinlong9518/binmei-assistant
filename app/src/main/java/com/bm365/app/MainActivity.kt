@@ -100,14 +100,8 @@ class MainActivity : AppCompatActivity() {
         // 初始状态栏颜色与标题栏一致
         window.statusBarColor = Color.parseColor("#1565C0")
 
-        // Toolbar 高度 = 42dp + 状态栏高度，顶部留出状态栏空间
-        val statusBarHeight = getStatusBarHeight()
-        val toolbarHeight = (42 * resources.displayMetrics.density).toInt() + statusBarHeight
-        binding.toolbar.layoutParams.height = toolbarHeight
-        binding.toolbar.setPadding(0, statusBarHeight, 0, 0)
-
-        // Android 15 边缘到边缘：底部积分卡片避让导航栏
-        applyNavInsetToPointsPanel()
+        // 边缘到边缘：状态栏高度注入标题栏（顶部避让），导航栏高度注入积分卡片（底部避让）
+        applyWindowInsets()
 
         // 入口：点击标题栏文字打开设置页（自定义 TextView 扩大热区）
         setupToolbarTitleClick()
@@ -149,11 +143,6 @@ class MainActivity : AppCompatActivity() {
 
         // 退出登录改为电源按钮：下拉显示账号列表 + 退出登录
         binding.btnLogout.setOnClickListener { showAccountMenu(it) }
-
-        // 电源按钮下沉至可视区（避开状态栏）
-        val lp = binding.btnLogout.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
-        lp.topMargin = statusBarHeight + ((42 * resources.displayMetrics.density).toInt() - 40 * resources.displayMetrics.density).toInt() / 2
-        binding.btnLogout.layoutParams = lp
 
         // 加载目标网址
         mainWebView.loadUrl(HOME_URL)
@@ -252,11 +241,6 @@ class MainActivity : AppCompatActivity() {
         BmAccountManager.clearSiteCookies()
         startActivity(Intent(this, LoginActivity::class.java))
         finish()
-    }
-
-    private fun getStatusBarHeight(): Int {
-        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
-        return if (resourceId > 0) resources.getDimensionPixelSize(resourceId) else 0
     }
 
     // ============================================================
@@ -550,12 +534,21 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    /** Android 15 边缘到边缘：底部积分卡片追加导航栏高度的外边距 */
-    private fun applyNavInsetToPointsPanel() {
+    /** 边缘到边缘 insets：标题栏内容整体下沉到状态栏以下可视区，积分卡片避让导航栏 */
+    private fun applyWindowInsets() {
+        val density = resources.displayMetrics.density
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // 顶部：Toolbar 总高 = 状态栏 + 内容区；内容锚点下沉到状态栏以下（标题/按钮都锚定它）
+            binding.toolbar.updateLayoutParams<android.view.ViewGroup.LayoutParams> {
+                height = bars.top + (42 * density).toInt()
+            }
+            binding.toolbarContentAnchor.updateLayoutParams<androidx.constraintlayout.widget.ConstraintLayout.LayoutParams> {
+                topMargin = bars.top
+            }
+            // 底部：积分卡片追加导航栏高度的外边距
             binding.pointsPanel.updateLayoutParams<android.view.ViewGroup.MarginLayoutParams> {
-                bottomMargin = bars.bottom + (6 * resources.displayMetrics.density).toInt()
+                bottomMargin = bars.bottom + (6 * density).toInt()
             }
             insets
         }
