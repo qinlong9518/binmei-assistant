@@ -69,10 +69,9 @@ class MainActivity : AppCompatActivity() {
         private const val HOME_URL = "http://61.185.41.209:8888/PersonWap/Index0018"
         private const val JS_BRIDGE_NAME = "Android"
 
-        // 电源按钮下拉菜单项 ID
-        private const val MENU_MORE = 900001
-        private const val MENU_LOGOUT = 900002
-        private const val MENU_NONE_ID = 900003
+        // 账号弹窗特殊动作
+        private const val ACTION_MORE = "more"
+        private const val ACTION_LOGOUT = "logout"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -153,55 +152,63 @@ class MainActivity : AppCompatActivity() {
         BmUpdateUi.check(this, silent = true)
     }
 
-    /** 电源按钮下拉菜单：账号列表（最多5个+更多折叠）+ 退出登录 */
+    /** 电源按钮下拉菜单：紧凑宽度 + 账号列表（最多5个+更多折叠）+ 退出登录 */
     private fun showAccountMenu(anchor: View) {
-        val accountManager = BmAccountManager(this)
-        val accounts = accountManager.getAccounts()
-        val current = accountManager.lastAccount() ?: ""
+        val am = BmAccountManager(this)
+        val accounts = am.getAccounts()
+        val current = am.lastAccount() ?: ""
+        if (accounts.isEmpty()) return
 
-        val popup = PopupMenu(this, anchor)
-        // 显示人名（无姓名映射时回落显示账号）
-        val header = popup.menu.add(Menu.FIRST, 999999, Menu.NONE, "当前账号：${accountManager.displayName(current)}")
-        header.isEnabled = false
-        header.isCheckable = false
-
-        // 最多显示 5 个账号，其余折叠进「更多账号…」二级菜单
         val shown = accounts.take(5)
         val rest = accounts.drop(5)
-        shown.forEach { acc ->
-            val item = popup.menu.add(0, acc.hashCode(), Menu.NONE, accountManager.displayName(acc))
-            if (acc == current) item.setIcon(android.R.drawable.ic_menu_myplaces)
-        }
-        if (rest.isNotEmpty()) {
-            val more = popup.menu.addSubMenu(0, MENU_MORE, Menu.NONE, "更多账号（${rest.size}）…")
-            rest.forEach { acc ->
-                val item = more.add(0, acc.hashCode(), Menu.NONE, accountManager.displayName(acc))
-                if (acc == current) item.setIcon(android.R.drawable.ic_menu_myplaces)
-            }
-        }
-        // 分隔 + 退出登录
-        popup.menu.add(Menu.NONE, MENU_NONE_ID, Menu.NONE, "—").isEnabled = false
-        popup.menu.add(Menu.NONE, MENU_LOGOUT, Menu.NONE, "退出登录")
-            .setIcon(android.R.drawable.ic_lock_power_off)
 
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                MENU_LOGOUT -> {
-                    confirmLogout()
-                    true
-                }
-                MENU_MORE, MENU_NONE_ID, 999999 -> false
-                else -> {
-                    // 菜单项显示的是人名，按 菜单ID=账号hashCode 反查真实账号再切换
-                    val acc = accounts.firstOrNull { it.hashCode() == item.itemId }
-                    if (acc != null && acc != current) {
-                        switchAccount(acc)
-                    }
-                    true
-                }
+        // 弹窗条目：label 显示文本，account=null 表示特殊动作项
+        data class Entry(val label: String, val account: String?, val action: String? = null)
+        val entries = shown.map { acc ->
+            val mark = if (acc == current) "✓ " else ""
+            Entry(mark + am.displayName(acc), acc)
+        }.toMutableList()
+        if (rest.isNotEmpty()) entries.add(Entry("更多账号（${rest.size}）…", null, ACTION_MORE))
+        entries.add(Entry("退出登录", null, ACTION_LOGOUT))
+
+        val lpw = android.widget.ListPopupWindow(this)
+        lpw.setAnchorView(anchor)
+        // 紧凑宽度：屏幕的 45%，限制在 180~240dp
+        val w = ((resources.displayMetrics.widthPixels * 0.45).toInt())
+            .coerceIn((180 * resources.displayMetrics.density).toInt(), (240 * resources.displayMetrics.density).toInt())
+        lpw.setWidth(w)
+        lpw.setAdapter(android.widget.ArrayAdapter(this, android.R.layout.simple_list_item_1, entries.map { it.label }))
+        lpw.setOnItemClickListener { _, _, pos, _ ->
+            lpw.dismiss()
+            val e = entries.getOrNull(pos) ?: return@setOnItemClickListener
+            when (e.action) {
+                ACTION_MORE -> showMoreAccountsMenu(anchor, rest, current)
+                ACTION_LOGOUT -> confirmLogout()
+                else -> if (e.account != null && e.account != current) switchAccount(e.account)
             }
         }
-        popup.show()
+        lpw.show()
+    }
+
+    /** 「更多账号」二级弹窗（同样紧凑宽度） */
+    private fun showMoreAccountsMenu(anchor: View, rest: List<String>, current: String) {
+        val am = BmAccountManager(this)
+        val lpw = android.widget.ListPopupWindow(this)
+        lpw.setAnchorView(anchor)
+        val w = ((resources.displayMetrics.widthPixels * 0.45).toInt())
+            .coerceIn((180 * resources.displayMetrics.density).toInt(), (240 * resources.displayMetrics.density).toInt())
+        lpw.setWidth(w)
+        lpw.setAdapter(
+            android.widget.ArrayAdapter(
+                this, android.R.layout.simple_list_item_1,
+                rest.map { acc -> (if (acc == current) "✓ " else "") + am.displayName(acc) }
+            )
+        )
+        lpw.setOnItemClickListener { _, _, pos, _ ->
+            lpw.dismiss()
+            rest.getOrNull(pos)?.let { if (it != current) switchAccount(it) }
+        }
+        lpw.show()
     }
 
     /**
@@ -289,13 +296,13 @@ class MainActivity : AppCompatActivity() {
             pointsAdapter.submitList(list)
             binding.pointsRecyclerView.visibility =
                 if (list.isNullOrEmpty()) View.GONE else View.VISIBLE
+            // 转发考试积分明细（手机考试/模拟考试分别判断，自动开考数据源）
+            pushExamPointsToMain(list)
         }
 
         // 总积分
         viewModel.totalPoints.observe(this) { total ->
             binding.totalPointsValue.text = total.toString()
-            // 转发给主 WebView：自动开考脚本据此判断是否达标（<24 自动开考）
-            pushPointsToMain(total)
         }
 
         // 状态文本
@@ -383,10 +390,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** 把今日积分转发给主 WebView（auto_start.js 的目标判断数据源） */
-    private fun pushPointsToMain(total: Int) {
+    /** 把考试积分明细转发给主 WebView：{"手机考试":{"cur":24,"max":24},...}（auto_start.js 数据源） */
+    private fun pushExamPointsToMain(list: List<PointsItem>?) {
         if (!::mainWebView.isInitialized) return
-        mainWebView.evaluateJavascript("window.BM_POINTS_TOTAL=$total;", null)
+        val json = list.orEmpty()
+            .filter { it.name.contains("手机考试") || it.name.contains("模拟考试") }
+            .joinToString(",", "{", "}") {
+                "\"${it.name}\":{\"cur\":${it.current},\"max\":${it.max}}"
+            }
+        mainWebView.evaluateJavascript("window.BM_EXAM_POINTS=$json;", null)
     }
 
     /** 注入自动开考调度脚本（积分 <24 → 自动进手机考试 → 点试卷二） */
