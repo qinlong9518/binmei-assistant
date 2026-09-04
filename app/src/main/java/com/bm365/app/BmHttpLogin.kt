@@ -22,7 +22,7 @@ object BmHttpLogin {
     private const val LOGIN_API = "$BASE/PersonWap/GetPersonInfo"
 
     /** 登录结果 */
-    data class Result(val success: Boolean, val pid: String = "", val message: String = "")
+    data class Result(val success: Boolean, val pid: String = "", val name: String = "", val message: String = "")
 
     /**
      * 登录（网络请求，须在子线程调用）。
@@ -61,6 +61,8 @@ object BmHttpLogin {
 
             if (strs.firstOrNull()?.isEmpty() == true) {
                 val pid = strs.getOrElse(1) { "" }
+                // 响应格式（实测）：|pid|姓名|MD5校验 → 第3个字段为姓名
+                val name = strs.getOrElse(2) { "" }.trim()
                 // 1) 服务端 Set-Cookie 同步进全局 CookieManager（会话态）
                 val setCookies = conn.headerFields?.get("Set-Cookie")
                 if (setCookies != null) {
@@ -71,7 +73,7 @@ object BmHttpLogin {
                 // 2) 复刻站点登录成功逻辑写身份 Cookie（escape 值 + path=/）
                 writeIdentityCookies(account, pid, password)
                 CookieManager.getInstance().flush()
-                Result(true, pid = pid)
+                Result(true, pid = pid, name = name)
             } else {
                 Result(false, message = strs.firstOrNull() ?: "登录失败")
             }
