@@ -30,12 +30,19 @@
         android:textColor="@color/on_primary"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="@id/toolbar"
-        app:layout_constraintBottom_toBottomOf="@id/toolbar"
+        app:layout_constraintTop_toTopOf="@id/toolbarContentAnchor"
+        app:layout_constraintBottom_toBottomOf="@id/toolbarContentAnchor"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 电源按钮：账号下拉切换 + 退出登录（topMargin 代码动态对齐可视区） -->
+    <!-- 标题栏内容锚点：topMargin=状态栏高度（代码动态），标题与按钮锚定它，保证都位于状态栏以下可视区 -->
+    <View
+        android:id="@+id/toolbarContentAnchor"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/btnLogout"
         android:layout_width="40dp"
@@ -44,7 +51,7 @@
         android:background="?android:attr/selectableItemBackgroundBorderless"
         android:contentDescription="账号与退出登录"
         android:src="@drawable/ic_power"
-        app:layout_constraintTop_toTopOf="@id/toolbar"
+        app:layout_constraintTop_toTopOf="@id/toolbarContentAnchor"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- 主 WebView -->
