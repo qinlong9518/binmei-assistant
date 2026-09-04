@@ -22,6 +22,8 @@
     <string name="settings_lock_desc">答题后动作锁保持时长，防止重复作答</string>
     <string name="settings_total_questions">总题数</string>
     <string name="settings_total_questions_desc">答满该题数后触发交卷判断</string>
+    <string name="settings_auto_qcount">自动题数</string>
+    <string name="settings_auto_qcount_desc">按试卷下发的总题数作答，开启后上方总题数设置失效</string>
     <string name="settings_auto_submit">自动交卷</string>
     <string name="settings_auto_submit_desc">关闭后答满题数也不再自动交卷</string>
     <string name="settings_group_points">积分监控</string>
