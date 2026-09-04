@@ -33,16 +33,23 @@ class BmAccountManager(context: Context) {
         }
     }
 
-    /** 登录成功后调用：记录账号（去重置顶） */
-    fun onLoginSuccess(account: String) {
+    /** 登录成功后调用：记录账号（去重置顶），并保存账号对应的姓名（供界面显示人名） */
+    fun onLoginSuccess(account: String, name: String? = null) {
         val list = getAccounts().toMutableList()
         list.remove(account)
         list.add(0, account)
-        prefs.edit()
+        val editor = prefs.edit()
             .putString(KEY_ACCOUNTS, org.json.JSONArray(list).toString())
             .putString(KEY_LAST_ACCOUNT, account)
-            .apply()
+        if (!name.isNullOrBlank()) {
+            editor.putString(KEY_NAME_PREFIX + account, name)
+        }
+        editor.apply()
     }
+
+    /** 账号显示名：有姓名映射显示人名，否则回落显示账号本身 */
+    fun displayName(account: String): String =
+        prefs.getString(KEY_NAME_PREFIX + account, null)?.takeIf { it.isNotBlank() } ?: account
 
     /** 退出登录：仅清除"最近登录"标记，账号列表保留（下拉可快速重选） */
     fun logout() {
@@ -53,6 +60,9 @@ class BmAccountManager(context: Context) {
         const val PREFS_NAME = "bm_accounts"
         const val KEY_ACCOUNTS = "accounts_json"
         const val KEY_LAST_ACCOUNT = "last_account"
+
+        /** 姓名 映射键前缀：name_<账号> */
+        const val KEY_NAME_PREFIX = "name_"
 
         /** 全部账号统一默认密码（按业务需求内置） */
         const val DEFAULT_PASSWORD = "Ydmk12345.6"
