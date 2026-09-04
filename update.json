@@ -1,8 +1,8 @@
 {
-  "versionCode": 14,
-  "versionName": "1.7.1",
+  "versionCode": 15,
+  "versionName": "1.7.2",
   "force": false,
-  "changelog": "1. 自动开考升级：手机考试/模拟考试分别按各自积分是否满24判断，自动选择未满项开考\n2. 登录页切换账号显示人名\n3. 电源菜单改为紧凑弹窗\n4. 更新改为后台下载+通知栏进度，完成后自动弹安装",
-  "apkUrl": "https://github.com/qinlong9518/binmei-assistant/releases/download/v1.7.1/app-release.apk",
+  "changelog": "1. 进入软件时考试积分未满会询问是否自动答题\n2. 自动选题脚本改为3秒状态检测驱动，有变化立即执行\n3. 电源菜单进一步收窄\n4. 登录页下拉居中显示\n5. 修复设置开关重启后失效的问题（即时保存）",
+  "apkUrl": "https://github.com/qinlong9518/binmei-assistant/releases/download/v1.7.2/app-release.apk",
   "apkFile": "app-release.apk"
 }
