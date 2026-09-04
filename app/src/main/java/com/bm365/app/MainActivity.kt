@@ -55,6 +55,7 @@ class MainActivity : AppCompatActivity() {
     /** JS 脚本内容（从 assets 预加载） */
     private var autoAnswerScript: String = ""
     private var pointsMonitorScript: String = ""
+    private var autoStartScript: String = ""
 
     /** 设置持久化 + 当前生效配置 */
     private lateinit var bmSettings: BmSettings
@@ -259,6 +260,12 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             "console.log('积分脚本加载失败: ${e.message}');"
         }
+
+        autoStartScript = try {
+            assets.open("auto_start.js").bufferedReader().readText()
+        } catch (e: Exception) {
+            "console.log('自动开考脚本加载失败: ${e.message}');"
+        }
     }
 
     // ============================================================
@@ -284,6 +291,8 @@ class MainActivity : AppCompatActivity() {
         // 总积分
         viewModel.totalPoints.observe(this) { total ->
             binding.totalPointsValue.text = total.toString()
+            // 转发给主 WebView：自动开考脚本据此判断是否达标（<24 自动开考）
+            pushPointsToMain(total)
         }
 
         // 状态文本
@@ -347,9 +356,10 @@ class MainActivity : AppCompatActivity() {
 
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
-            // 先下发配置（首次注入，不派发事件），再注入答题脚本
+            // 先下发配置（首次注入，不派发事件），再注入答题脚本 + 自动开考调度脚本
             pushConfigTo(mainWebView, fireEvent = false)
             injectAutoAnswerScript()
+            injectAutoStartScript()
             // 提取页面主题色
             extractPageColor()
         }
@@ -367,6 +377,19 @@ class MainActivity : AppCompatActivity() {
     private fun injectAutoAnswerScript() {
         if (autoAnswerScript.isNotBlank()) {
             mainWebView.evaluateJavascript(autoAnswerScript, null)
+        }
+    }
+
+    /** 把今日积分转发给主 WebView（auto_start.js 的目标判断数据源） */
+    private fun pushPointsToMain(total: Int) {
+        if (!::mainWebView.isInitialized) return
+        mainWebView.evaluateJavascript("window.BM_POINTS_TOTAL=$total;", null)
+    }
+
+    /** 注入自动开考调度脚本（积分 <24 → 自动进手机考试 → 点试卷二） */
+    private fun injectAutoStartScript() {
+        if (autoStartScript.isNotBlank()) {
+            mainWebView.evaluateJavascript(autoStartScript, null)
         }
     }
 
