@@ -17,7 +17,7 @@
     // 配置读取：原生注入 window.BM_CFG（全量替换），并派发 'bm-cfg' 事件
     // ==========================================
     if (!window.BM_CFG) {
-        window.BM_CFG = { examPollMs: 200, answerDelayMs: 50, lockMs: 80, pointsPollMs: 5000, totalQuestions: 40, autoSubmit: true };
+        window.BM_CFG = { examPollMs: 200, answerDelayMs: 50, lockMs: 80, pointsPollMs: 5000, totalQuestions: 40, autoSubmit: true, autoQuestionCount: false };
     }
 
     function cfg() { return window.BM_CFG || {}; }
@@ -39,6 +39,27 @@
         return v;
     }
     function isAutoSubmit() { return cfg().autoSubmit !== false; }
+    function isAutoQCount() { return cfg().autoQuestionCount === true; }
+
+    /**
+     * 动态解析本次应答总题数：
+     * - 自动题数开启：优先取试卷下发的题库数组 allShiTi.length（权威值，
+     *   与左上角"本试卷总题数"同源），兜底匹配页面文本"共X题"；都取不到回落设置值
+     * - 自动题数关闭：固定使用设置里的 totalQuestions
+     */
+    function resolveTotalQuestions() {
+        var fallback = getTotalQuestions();
+        if (!isAutoQCount()) return fallback;
+        try {
+            var W = window;
+            if (W.allShiTi && W.allShiTi.length > 0) return W.allShiTi.length;
+        } catch (e) {}
+        try {
+            var m = (document.body.innerText || "").match(/(?:本试卷)?共\s*(\d{1,3})\s*题/);
+            if (m && parseInt(m[1], 10) > 0) return parseInt(m[1], 10);
+        } catch (e) {}
+        return fallback;
+    }
 
     // 供原生调试/兜底调用：window.BM_APPLY_CFG('{"totalQuestions":50,...}')
     window.BM_APPLY_CFG = function(json) {
@@ -147,7 +168,8 @@
         if (!(W.vData && W.onlineCur && W.allShiTi)) return;
         if (actionLock) return;
 
-        let TOTAL_QUESTIONS = getTotalQuestions(); // 交卷阈值动态化：每次循环实时读取
+        // 交卷阈值动态化：每次循环实时解析（自动题数开启时跟随试卷下发数量）
+        let TOTAL_QUESTIONS = resolveTotalQuestions();
         let currentNum = parseInt(W.onlineCur, 10);
         if (currentNum > TOTAL_QUESTIONS) return;
 
