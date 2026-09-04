@@ -24,6 +24,10 @@ class PointsViewModel : ViewModel() {
     private val _totalPoints = MutableLiveData(0)
     val totalPoints: LiveData<Int> = _totalPoints
 
+    /** 各积分明细的当前值映射（键=AccumulateName，如"手机考试"→24），供自动开考分别判断 */
+    private val _curByName = MutableLiveData<Map<String, Int>>(emptyMap())
+    val curByName: LiveData<Map<String, Int>> = _curByName
+
     /** 状态文本（加载中 / 错误 / 请登录） */
     private val _statusText = MutableLiveData("积分加载中...")
     val statusText: LiveData<String> = _statusText
@@ -85,6 +89,7 @@ class PointsViewModel : ViewModel() {
 
             _pointsList.postValue(items)
             _totalPoints.postValue(total)
+            _curByName.postValue(items.associate { it.name to it.current })
             _isEmpty.postValue(items.isEmpty())
             _statusText.postValue(if (items.isEmpty()) "暂无积分数据" else "")
 
