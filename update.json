@@ -1,8 +1,8 @@
 {
-  "versionCode": 9,
-  "versionName": "1.6.1",
+  "versionCode": 10,
+  "versionName": "1.6.2",
   "force": false,
-  "changelog": "1. 更新检测加 cache-buster，彻底解决版本检测滞后\n2. 标题始终居中+电源按钮账号菜单（含 v1.6 功能）",
-  "apkUrl": "https://github.com/qinlong9518/binmei-assistant/releases/download/v1.6.1/app-release.apk",
+  "changelog": "1. 修复标题被状态栏遮挡一半：标题栏内容改用系统 insets 精确对齐状态栏以下可视区（兼容刘海屏/异形屏）\n2. 电源按钮位置同步精准对齐",
+  "apkUrl": "https://github.com/qinlong9518/binmei-assistant/releases/download/v1.6.2/app-release.apk",
   "apkFile": "app-release.apk"
 }
