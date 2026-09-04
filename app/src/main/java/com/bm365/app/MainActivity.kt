@@ -316,7 +316,8 @@ class MainActivity : AppCompatActivity() {
     private fun setupPointsRecyclerView() {
         pointsAdapter = PointsAdapter()
         binding.pointsRecyclerView.apply {
-            layoutManager = androidx.recyclerview.widget.GridLayoutManager(this@MainActivity, 2)
+            // 每行 3 项：6 个积分项排成两行
+            layoutManager = androidx.recyclerview.widget.GridLayoutManager(this@MainActivity, 3)
             adapter = pointsAdapter
         }
     }
@@ -331,11 +332,6 @@ class MainActivity : AppCompatActivity() {
             pushExamPointsToMain(list)
             // 首次拿到积分明细时，若有未满项则询问是否自动答题
             maybePromptAutoStart(list)
-        }
-
-        // 总积分
-        viewModel.totalPoints.observe(this) { total ->
-            binding.totalPointsValue.text = total.toString()
         }
 
         // 状态文本
