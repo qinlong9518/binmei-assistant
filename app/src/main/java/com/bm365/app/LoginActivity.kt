@@ -61,11 +61,17 @@ class LoginActivity : AppCompatActivity() {
 
         btnSwitchAccount.setOnClickListener { anchor ->
             val popup = PopupMenu(this, anchor)
-            accounts.forEach { popup.menu.add(it) }
+            // 显示人名（无姓名映射时回落显示账号）
+            val displayNames = accounts.map { accountManager.displayName(it) }
+            displayNames.forEach { popup.menu.add(it) }
             popup.setOnMenuItemClickListener { item ->
-                etAccount.setText(item.title)
-                etAccount.setSelection(etAccount.text.length)
-                tvError.visibility = View.GONE
+                // 按显示名反查真实账号（身份证号）
+                val acc = accounts.getOrNull(displayNames.indexOf(item.title))
+                acc?.let {
+                    etAccount.setText(it)
+                    etAccount.setSelection(it.length)
+                    tvError.visibility = View.GONE
+                }
                 true
             }
             popup.show()
