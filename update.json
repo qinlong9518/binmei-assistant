@@ -1,8 +1,8 @@
 {
-  "versionCode": 12,
-  "versionName": "1.6.4",
+  "versionCode": 13,
+  "versionName": "1.7.0",
   "force": false,
-  "changelog": "1. 修复在线更新下载卡0%：改为国内镜像优先（ghfast/ghproxy），缩短超时，移除已失效镜像\n2. 自动开考调度（v1.6.3）与标题遮挡修复（v1.6.2）",
-  "apkUrl": "https://github.com/qinlong9518/binmei-assistant/releases/download/v1.6.4/app-release.apk",
+  "changelog": "1. 新增自动题数开关：开启后按试卷下发数量答题，设置里的总题数失效\n2. 电源菜单与账号切换显示人名，不再显示身份证号\n3. 修复在线更新下载卡0%（v1.6.4）",
+  "apkUrl": "https://github.com/qinlong9518/binmei-assistant/releases/download/v1.7.0/app-release.apk",
   "apkFile": "app-release.apk"
 }
