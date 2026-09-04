@@ -132,11 +132,12 @@ class SettingsActivity : AppCompatActivity() {
 
     /** 把配置写入滑块/开关（UI 预览） */
     private fun bindFromConfig(cfg: BmConfig) {
-        binding.sliderExamPoll.value = cfg.examPollMs.toFloat()
-        binding.sliderAnswerDelay.value = cfg.answerDelayMs.toFloat()
-        binding.sliderLock.value = cfg.lockMs.toFloat()
+        binding.sliderExamPoll.value = cfg.examPollMs.toFloat().coerceIn(10f, 100f)
+        binding.sliderAnswerDelay.value = cfg.answerDelayMs.toFloat().coerceIn(10f, 100f)
+        binding.sliderLock.value = cfg.lockMs.toFloat().coerceIn(10f, 100f)
         binding.sliderTotalQuestions.value = cfg.totalQuestions.toFloat()
-        binding.sliderPointsPoll.value = cfg.pointsPollMs.toFloat()
+        binding.sliderPointsPoll.value = cfg.pointsPollMs.toFloat().coerceIn(1000f, 5000f)
+        binding.sliderAutoStartPoll.value = cfg.autoStartPollMs.toFloat().coerceIn(1000f, 5000f)
         binding.switchAutoSubmit.isChecked = cfg.autoSubmit
         binding.switchAutoQCount.isChecked = cfg.autoQuestionCount
         refreshValueLabels()
@@ -156,6 +157,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.sliderLock.addOnChangeListener { _, _, _ -> refreshValueLabels() }
         binding.sliderTotalQuestions.addOnChangeListener { _, _, _ -> refreshValueLabels() }
         binding.sliderPointsPoll.addOnChangeListener { _, _, _ -> refreshValueLabels() }
+        binding.sliderAutoStartPoll.addOnChangeListener { _, _, _ -> refreshValueLabels() }
 
         // 开关类设置即时持久化（修复：开关打开后不按保存，重启丢失）
         // 变更即写入 SharedPreferences；离开设置页时 MainActivity 收到结果并热下发新配置
@@ -193,7 +195,8 @@ class SettingsActivity : AppCompatActivity() {
         pointsPollMs = binding.sliderPointsPoll.value.toInt(),
         totalQuestions = binding.sliderTotalQuestions.value.toInt(),
         autoSubmit = binding.switchAutoSubmit.isChecked,
-        autoQuestionCount = binding.switchAutoQCount.isChecked
+        autoQuestionCount = binding.switchAutoQCount.isChecked,
+        autoStartPollMs = binding.sliderAutoStartPoll.value.toInt()
     )
 
     /** 通知 MainActivity 立即应用最新配置 */
@@ -213,6 +216,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.valueLock.text = getString(R.string.fmt_ms, binding.sliderLock.value.toInt())
         binding.valueTotalQuestions.text = getString(R.string.fmt_questions, binding.sliderTotalQuestions.value.toInt())
         binding.valuePointsPoll.text = getString(R.string.fmt_ms, binding.sliderPointsPoll.value.toInt())
+        binding.valueAutoStartPoll.text = getString(R.string.fmt_ms, binding.sliderAutoStartPoll.value.toInt())
     }
 
     companion object {
