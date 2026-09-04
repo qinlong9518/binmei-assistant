@@ -60,21 +60,31 @@ class LoginActivity : AppCompatActivity() {
         accountManager.lastAccount()?.let { etAccount.setText(it) }
 
         btnSwitchAccount.setOnClickListener { anchor ->
-            val popup = PopupMenu(this, anchor)
-            // 显示人名（无姓名映射时回落显示账号）
+            // 居中下拉弹窗：宽度随内容，水平居中于按钮
             val displayNames = accounts.map { accountManager.displayName(it) }
-            displayNames.forEach { popup.menu.add(it) }
-            popup.setOnMenuItemClickListener { item ->
-                // 按显示名反查真实账号（身份证号）
-                val acc = accounts.getOrNull(displayNames.indexOf(item.title))
+            val lpw = android.widget.ListPopupWindow(this)
+            lpw.setAnchorView(anchor)
+            lpw.setAdapter(
+                android.widget.ArrayAdapter(this, android.R.layout.simple_list_item_1, displayNames)
+            )
+            lpw.setOnItemClickListener { _, _, pos, _ ->
+                lpw.dismiss()
+                val acc = accounts.getOrNull(pos)
                 acc?.let {
                     etAccount.setText(it)
                     etAccount.setSelection(it.length)
                     tvError.visibility = View.GONE
                 }
-                true
             }
-            popup.show()
+            anchor.post {
+                // 内容宽度（至少与按钮等宽），再水平居中：偏移 = (锚点宽 - 弹窗宽)/2
+                val lvw = lpw.listView
+                val contentW = (lvw?.measuredWidth ?: 0)
+                    .coerceAtLeast(anchor.width)
+                lpw.setContentWidth(contentW)
+                lpw.horizontalOffset = ((anchor.width - contentW) / 2)
+                lpw.show()
+            }
         }
     }
 
