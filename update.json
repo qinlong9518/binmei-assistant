@@ -1,8 +1,8 @@
 {
-  "versionCode": 15,
-  "versionName": "1.7.2",
+  "versionCode": 16,
+  "versionName": "1.7.3",
   "force": false,
-  "changelog": "1. 进入软件时考试积分未满会询问是否自动答题\n2. 自动选题脚本改为3秒状态检测驱动，有变化立即执行\n3. 电源菜单进一步收窄\n4. 登录页下拉居中显示\n5. 修复设置开关重启后失效的问题（即时保存）",
-  "apkUrl": "https://github.com/qinlong9518/binmei-assistant/releases/download/v1.7.2/app-release.apk",
+  "changelog": "1. 底部积分面板精简：移除今日积分/总计标题行，6 个积分项改为两行、每行三个",
+  "apkUrl": "https://github.com/qinlong9518/binmei-assistant/releases/download/v1.7.3/app-release.apk",
   "apkFile": "app-release.apk"
 }
