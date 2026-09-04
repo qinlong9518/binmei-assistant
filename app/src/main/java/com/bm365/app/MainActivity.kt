@@ -52,6 +52,9 @@ class MainActivity : AppCompatActivity() {
     /** 积分适配器 */
     private lateinit var pointsAdapter: PointsAdapter
 
+    /** 自动答题提示框：每次进入软件只弹一次 */
+    private var autoStartPromptShown = false
+
     /** JS 脚本内容（从 assets 预加载） */
     private var autoAnswerScript: String = ""
     private var pointsMonitorScript: String = ""
@@ -152,6 +155,37 @@ class MainActivity : AppCompatActivity() {
         BmUpdateUi.check(this, silent = true)
     }
 
+    /** 弹窗统一宽度：屏幕 27%，钳制 105~140dp */
+    private fun popupWidth(): Int =
+        ((resources.displayMetrics.widthPixels * 0.27).toInt())
+            .coerceIn((105 * resources.displayMetrics.density).toInt(), (140 * resources.displayMetrics.density).toInt())
+
+    /** 进入软件时若有考试积分未满，询问是否自动答题（拒绝则本会话停用 auto_start.js） */
+    private fun maybePromptAutoStart(list: List<PointsItem>?) {
+        if (autoStartPromptShown || list.isNullOrEmpty()) return
+        autoStartPromptShown = true
+        val unmet = mutableListOf<String>()
+        list.forEach {
+            if (it.name.contains("手机考试") && it.current < it.max) unmet.add("手机考试 ${it.current}/${it.max}")
+            if (it.name.contains("模拟考试") && it.current < it.max) unmet.add("模拟考试 ${it.current}/${it.max}")
+        }
+        if (unmet.isEmpty()) return
+
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("自动答题")
+            .setMessage("当前考试积分未满：\n${unmet.joinToString("\n")}\n\n是否自动开考（自动选择试卷二作答）？")
+            .setPositiveButton("自动答题") { _, _ ->
+                Toast.makeText(this, "已开启自动答题，将自动选择未满项开考", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("暂不自动") { _, _ ->
+                if (::mainWebView.isInitialized) {
+                    mainWebView.evaluateJavascript("window.BM_AUTOSTART_DISABLED=true;", null)
+                }
+            }
+            .setCancelable(false)
+            .show()
+    }
+
     /** 电源按钮下拉菜单：紧凑宽度 + 账号列表（最多5个+更多折叠）+ 退出登录 */
     private fun showAccountMenu(anchor: View) {
         val am = BmAccountManager(this)
@@ -173,9 +207,8 @@ class MainActivity : AppCompatActivity() {
 
         val lpw = android.widget.ListPopupWindow(this)
         lpw.setAnchorView(anchor)
-        // 紧凑宽度：屏幕的 45%，限制在 180~240dp
-        val w = ((resources.displayMetrics.widthPixels * 0.45).toInt())
-            .coerceIn((180 * resources.displayMetrics.density).toInt(), (240 * resources.displayMetrics.density).toInt())
+        // 紧凑宽度：屏幕的 27%，限制在 105~140dp
+        val w = popupWidth()
         lpw.setWidth(w)
         lpw.setAdapter(android.widget.ArrayAdapter(this, android.R.layout.simple_list_item_1, entries.map { it.label }))
         lpw.setOnItemClickListener { _, _, pos, _ ->
@@ -195,9 +228,7 @@ class MainActivity : AppCompatActivity() {
         val am = BmAccountManager(this)
         val lpw = android.widget.ListPopupWindow(this)
         lpw.setAnchorView(anchor)
-        val w = ((resources.displayMetrics.widthPixels * 0.45).toInt())
-            .coerceIn((180 * resources.displayMetrics.density).toInt(), (240 * resources.displayMetrics.density).toInt())
-        lpw.setWidth(w)
+        lpw.setWidth(popupWidth())
         lpw.setAdapter(
             android.widget.ArrayAdapter(
                 this, android.R.layout.simple_list_item_1,
@@ -298,6 +329,8 @@ class MainActivity : AppCompatActivity() {
                 if (list.isNullOrEmpty()) View.GONE else View.VISIBLE
             // 转发考试积分明细（手机考试/模拟考试分别判断，自动开考数据源）
             pushExamPointsToMain(list)
+            // 首次拿到积分明细时，若有未满项则询问是否自动答题
+            maybePromptAutoStart(list)
         }
 
         // 总积分
