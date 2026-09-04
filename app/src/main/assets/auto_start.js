@@ -16,7 +16,7 @@
     }
     window.BM_AUTOSTART_INJECTED = true;
 
-    var POLL_MS = 3000;      // 轮询间隔：检测页面变化
+    var POLL_MS = getPollMs();   // 轮询间隔（设置页可调，bm-cfg 热更新生效）
     var TAB_TRIES_LIMIT = 4; // 同一 Tab 连点上限（防异常循环）
 
     var lastSig = "";        // 上一轮状态签名
@@ -172,14 +172,22 @@
         }
     }
 
+    var POLL_MS_FALLBACK = 3000;   // 未配置时的默认轮询
+    var POLL_MIN = 1000, POLL_MAX = 5000; // 设置可调范围（与设置页滑块一致）
     var pausedUntil = 0;
     function busyPause() { pausedUntil = Date.now() + 300000; }
+
+    function getPollMs() {
+        var v = parseInt(window.BM_CFG && window.BM_CFG.autoStartPollMs, 10);
+        if (isNaN(v)) v = POLL_MS_FALLBACK;
+        return Math.max(POLL_MIN, Math.min(POLL_MAX, v));
+    }
 
     function loop() {
         setTimeout(function() {
             if (Date.now() >= pausedUntil) tick();
             loop();
-        }, POLL_MS);
+        }, getPollMs());
     }
     loop();
 
@@ -187,5 +195,5 @@
         setTimeout(tick, 0);
     });
 
-    log("已注入（v3：状态检测驱动，轮询 " + POLL_MS + "ms）");
+    log("已注入（v3：状态检测驱动，轮询 " + getPollMs() + "ms）");
 })();
