@@ -244,36 +244,61 @@ object BmUpdateUi {
     }
 
     private fun startDownload(act: AppCompatActivity, meta: BmUpdate.Meta) {
-        val progress = ProgressBar(act, null, android.R.attr.progressBarStyleHorizontal)
-        val dialog = AlertDialog.Builder(act)
-            .setTitle("下载中 0%")
-            .setView(progress)
-            .setCancelable(false)
-            .create()
-        dialog.show()
+        // Android 13+ 通知运行时权限（未授权也能下载，只是状态栏不显示进度）
+        if (Build.VERSION.SDK_INT >= 33 &&
+            act.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                != android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            act.requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 9001)
+        }
+
+        Toast.makeText(act, "已开始后台下载，完成后自动弹出安装", Toast.LENGTH_SHORT).show()
+
+        val nm = act.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        val channel = android.app.NotificationChannel(CHANNEL_ID, "应用更新", android.app.NotificationManager.IMPORTANCE_LOW)
+        nm.createNotificationChannel(channel)
+
+        fun notifyProgress(pct: Int, text: String) {
+            val n = android.app.Notification.Builder(act, CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.stat_sys_download)
+                .setContentTitle("彬煤答题助手 更新 v${meta.versionName}")
+                .setContentText(text)
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setProgress(100, pct, false)
+            nm.notify(NOTIFY_ID, n.build())
+        }
+        notifyProgress(0, "准备下载…")
 
         Thread {
             val file = BmUpdate.downloadApk(act, meta) { pct ->
-                act.runOnUiThread {
-                    dialog.setTitle("下载中 $pct%")
-                    progress.progress = pct
-                }
+                notifyProgress(pct, "下载中 $pct%")
             }
             act.runOnUiThread {
-                dialog.dismiss()
-                when {
-                    file == null ->
-                        Toast.makeText(act, "下载失败，请检查网络后重试", Toast.LENGTH_SHORT).show()
-
-                    BmUpdate.canInstall(act) ->
-                        BmUpdate.install(act, file)
-
-                    else -> {
-                        Toast.makeText(act, "请先授权「安装未知应用」", Toast.LENGTH_LONG).show()
-                        BmUpdate.requestInstallPermission(act)
+                if (file == null) {
+                    nm.cancel(NOTIFY_ID)
+                    Toast.makeText(act, "下载失败，请检查网络后重试", Toast.LENGTH_SHORT).show()
+                } else {
+                    // 下载完成：完成通知 + 自动拉起安装界面
+                    val done = android.app.Notification.Builder(act, CHANNEL_ID)
+                        .setSmallIcon(android.R.drawable.stat_sys_download_done)
+                        .setContentTitle("更新下载完成")
+                        .setContentText("正在打开安装界面…")
+                        .setOngoing(false)
+                        .setAutoCancel(true)
+                    nm.notify(NOTIFY_ID, done.build())
+                    when {
+                        BmUpdate.canInstall(act) -> BmUpdate.install(act, file)
+                        else -> {
+                            Toast.makeText(act, "请先授权「安装未知应用」", Toast.LENGTH_LONG).show()
+                            BmUpdate.requestInstallPermission(act)
+                        }
                     }
                 }
             }
         }.start()
     }
+
+    private const val CHANNEL_ID = "bm_update"
+    private const val NOTIFY_ID = 1001
 }
