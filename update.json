@@ -1,8 +1,8 @@
 {
-  "versionCode": 17,
-  "versionName": "1.7.4",
+  "versionCode": 18,
+  "versionName": "1.7.5",
   "force": false,
-  "changelog": "1. 答题引擎速度调节范围调整为10-100ms\n2. 积分轮询范围调整为1000-5000ms\n3. 新增自动答题轮询设置（1000-5000ms）",
-  "apkUrl": "https://github.com/qinlong9518/binmei-assistant/releases/download/v1.7.4/app-release.apk",
+  "changelog": "1. 兼容性扩展：最低系统要求从Android 15降至Android 12，鸿蒙卓易通环境可正常安装\n2. 签名兼容：同时包含v1与v2签名方案，兼容各类安装器",
+  "apkUrl": "https://github.com/qinlong9518/binmei-assistant/releases/download/v1.7.5/app-release.apk",
   "apkFile": "app-release.apk"
 }
