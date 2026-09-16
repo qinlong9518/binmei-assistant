@@ -9,11 +9,12 @@ android {
 
     defaultConfig {
         applicationId = "com.bm365.app"
-        // 仅支持 Android 15+（minSdk 35），无需兼容老设备
-        minSdk = 35
+        // 兼容鸿蒙卓易通（Android 12/API 31 底座）及常规 Android 12+ 设备；
+        // 代码中所有高版本 API 均有 Build.VERSION 守卫，31 起全部可用
+        minSdk = 31
         targetSdk = 34
-        versionCode = 17
-        versionName = "1.7.4"
+        versionCode = 18
+        versionName = "1.7.5"
     }
 
     buildTypes {
@@ -23,8 +24,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // 使用 debug 签名，保证 release APK 可直接安装测试
-            signingConfig = signingConfigs.getByName("debug")
+            // 使用 debug 签名（可直接安装测试）；显式开启 v1+v2 双签名方案，
+            // 兼容卓易通等旧安装器（部分只校验 v1 JAR 签名）
+            signingConfig = signingConfigs.getByName("debug").apply {
+                enableV1Signing = true
+                enableV2Signing = true
+            }
         }
     }
 
