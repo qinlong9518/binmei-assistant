@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>彬煤答题助手 - 官网</title>
+<meta name="description" content="彬煤安培365自动答题助手：自动答题、自动开考、积分监控、账号切换，支持鸿蒙卓易通。">
+<style>
+  :root {
+    --green: #3ED588;
+    --green-dark: #1d892f;
+    --green-deep: #0f5c25;
+    --bg: #0d1512;
+    --card: #14201b;
+    --text: #e8f5ee;
+    --muted: #93a89d;
+    --border: #1f3229;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  a { color: var(--green); text-decoration: none; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 64px 0 48px;
+    background: radial-gradient(ellipse at top, rgba(62,213,136,.12), transparent 60%);
+  }
+  .logo {
+    width: 96px; height: 96px; border-radius: 22px;
+    box-shadow: 0 8px 32px rgba(62,213,136,.25);
+  }
+  h1 { font-size: 34px; margin: 18px 0 6px; }
+  .slogan { color: var(--muted); font-size: 16px; margin-bottom: 6px; }
+  .ver {
+    display: inline-block; margin: 10px 0 26px; padding: 3px 12px;
+    border: 1px solid var(--border); border-radius: 999px;
+    color: var(--green); font-size: 13px; background: rgba(62,213,136,.06);
+  }
+  .btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 13px 26px; border-radius: 12px;
+    font-size: 15px; font-weight: 600; transition: .2s;
+  }
+  .btn-primary { background: var(--green); color: #06281a; }
+  .btn-primary:hover { background: #55e69c; transform: translateY(-1px); }
+  .btn-ghost { border: 1px solid var(--border); color: var(--text); background: var(--card); }
+  .btn-ghost:hover { border-color: var(--green); color: var(--green); }
+  .dl-note { color: var(--muted); font-size: 12.5px; margin-top: 14px; }
+
+  /* Sections */
+  section { padding: 40px 0; }
+  h2 { font-size: 22px; margin-bottom: 20px; text-align: center; }
+  h2::after { content: ""; display: block; width: 36px; height: 3px; background: var(--green); margin: 10px auto 0; border-radius: 2px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px;
+  }
+  .card .ico { font-size: 26px; }
+  .card h3 { font-size: 16px; margin: 8px 0 6px; color: var(--green); }
+  .card p { color: var(--muted); font-size: 14px; }
+
+  /* Install steps */
+  .steps { counter-reset: step; }
+  .step {
+    position: relative; padding: 14px 16px 14px 56px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; margin-bottom: 10px; font-size: 14.5px;
+  }
+  .step::before {
+    counter-increment: step; content: counter(step);
+    position: absolute; left: 16px; top: 14px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--green); color: #06281a;
+    font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+  .step b { color: var(--text); }
+  .note { color: var(--muted); font-size: 13px; margin-top: 12px; }
+
+  /* Changelog */
+  .log { font-size: 14.5px; }
+  .log li { margin: 6px 0 6px 18px; color: var(--muted); }
+  .log b { color: var(--text); }
+
+  footer {
+    border-top: 1px solid var(--border);
+    text-align: center; padding: 26px 0 40px;
+    color: var(--muted); font-size: 13px;
+  }
+  footer a { color: var(--green); }
+</style>
+</head>
+<body>
+
+<div class="hero wrap">
+  <img class="logo" src="app/src/main/ic_launcher-playstore.png" alt="彬煤答题助手">
+  <h1>彬煤答题助手</h1>
+  <p class="slogan">彬煤安培365 · 自动答题 / 自动开考 / 积分监控，一部手机全搞定</p>
+  <span class="ver">当前版本 v1.7.5 · 支持 Android 12+ 与鸿蒙卓易通</span>
+  <div class="btns">
+    <a class="btn btn-primary" href="https://github.com/qinlong9518/binmei-assistant/releases/latest/download/app-release.apk">⬇ 下载最新版 APK</a>
+    <a class="btn btn-ghost" href="https://ghfast.top/https://github.com/qinlong9518/binmei-assistant/releases/latest/download/app-release.apk">国内镜像加速</a>
+    <a class="btn btn-ghost" href="https://github.com/qinlong9518/binmei-assistant/releases">全部版本</a>
+  </div>
+  <p class="dl-note">手机浏览器打开本页点击下载即可 · 安装时需允许「安装未知应用」</p>
+</div>
+
+<section class="wrap">
+  <h2>功能一览</h2>
+  <div class="grid">
+    <div class="card"><div class="ico">📝</div><h3>全自动答题</h3><p>进入试卷自动作答、自动翻题、答满自动交卷；题数可跟随试卷下发数量。</p></div>
+    <div class="card"><div class="ico">🎯</div><h3>智能自动开考</h3><p>「手机考试」「模拟考试」积分分别判断，未满 24 分自动选试卷二开考，考完接力下一项。</p></div>
+    <div class="card"><div class="ico">📊</div><h3>实时积分面板</h3><p>底部常驻今日积分明细，两行三列一目了然，随积分轮询自动刷新。</p></div>
+    <div class="card"><div class="ico">👥</div><h3>多账号切换</h3><p>电源菜单显示人名（不暴露证件号），最多 5 个账号快速切换，支持退出登录。</p></div>
+    <div class="card"><div class="ico">⚙️</div><h3>参数随心调</h3><p>答题速度、等待、锁定、各轮询间隔、总题数、自动题数开关，设置页实时生效。</p></div>
+    <div class="card"><div class="ico">🔄</div><h3>在线自更新</h3><p>后台下载 + 通知栏进度，完成后自动弹出安装；多镜像加速，国内秒下。</p></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>安装步骤</h2>
+  <div class="steps">
+    <div class="step">点击上方 <b>「下载最新版 APK」</b>（国内网络建议用镜像加速链接）。</div>
+    <div class="step">下载完成后在系统弹出的安装界面点 <b>「安装」</b>；首次安装需在设置中允许<b>「安装未知应用」</b>。</div>
+    <div class="step">打开 App，输入<b>账号</b>登录（密码与验证码已内置）。</div>
+    <div class="step">进入主页面即自动开始：积分不足时询问是否<b>自动开考</b>，之后全自动。</div>
+  </div>
+  <p class="note">· 鸿蒙系统请通过「卓易通」安装运行；此前安装过旧版本如提示签名冲突，先卸载再装。<br>· 应用完全本地运行，不上传任何数据到第三方服务器。</p>
+</section>
+
+<section class="wrap">
+  <h2>更新日志（v1.7.5）</h2>
+  <div class="card">
+    <ul class="log">
+      <li><b>兼容性</b>：最低系统要求降至 Android 12，鸿蒙卓易通可正常安装</li>
+      <li><b>签名</b>：v1 + v2 双签名方案，兼容各类安装器</li>
+      <li><b>历史</b>：自动题数开关、账号人名显示、紧凑菜单、后台下载更新、积分面板两行三列、速度调节范围优化……</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <p><a href="https://github.com/qinlong9518/binmei-assistant">GitHub 仓库</a> · 问题反馈请提交 Issue</p>
+  <p style="margin-top:6px">本工具仅供学习交流，请合理使用。</p>
+</footer>
+
+</body>
+</html>
