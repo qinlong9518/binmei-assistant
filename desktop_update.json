@@ -1,7 +1,7 @@
 {
-  "versionCode": 3,
-  "versionName": "1.9.1",
-  "changelog": "修复双击无反应：嵌入系统清单，新增崩溃日志 bm_crash.log/bm_debug.log",
+  "versionCode": 4,
+  "versionName": "1.9.2",
+  "changelog": "修复双击无反应（嵌入系统清单）+ CI 真机窗口验证通过",
   "exeUrl": "https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-desktop.exe",
   "force": false
 }
