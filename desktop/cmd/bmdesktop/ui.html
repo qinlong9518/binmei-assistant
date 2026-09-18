@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>彬煤答题助手 - 电脑端</title>
+<style>
+:root { --g:#07C160; --gd:#06AD56; --line:#e7e7e7; --muted:#888; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif; background:#f6f7f8; color:#1a1a1a; }
+.nav { position:sticky; top:0; z-index:10; background:rgba(255,255,255,.94); backdrop-filter:blur(12px); border-bottom:1px solid var(--line); }
+.nav-in { max-width:1080px; margin:0 auto; padding:0 24px; height:56px; display:flex; align-items:center; gap:12px; }
+.logo { width:28px; height:28px; border-radius:6px; background:var(--g); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; }
+.brand { font-size:16px; font-weight:600; }
+.badge { margin-left:auto; font-size:12px; padding:3px 10px; border-radius:20px; background:#f0f0f0; color:var(--muted); }
+.badge.on { background:#e8f8ee; color:var(--g); }
+.wrap { max-width:1080px; margin:20px auto; padding:0 24px; display:grid; grid-template-columns:340px 1fr; gap:16px; }
+.card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:18px; }
+.card h3 { font-size:14px; color:#666; margin-bottom:12px; font-weight:600; }
+.row { display:flex; gap:8px; margin-bottom:12px; }
+input[type=text] { flex:1; border:1px solid var(--line); border-radius:8px; padding:9px 12px; font-size:14px; outline:none; }
+input[type=text]:focus { border-color:var(--g); }
+button { border:none; border-radius:8px; padding:9px 16px; font-size:14px; cursor:pointer; background:#f2f2f2; color:#333; }
+button.pri { background:var(--g); color:#fff; }
+button.pri:hover { background:var(--gd); }
+button.danger { background:#fff; color:#e64340; border:1px solid #e64340; }
+button:disabled { opacity:.5; cursor:not-allowed; }
+.acct { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:8px; cursor:pointer; font-size:14px; }
+.acct:hover { background:#f7f7f7; }
+.acct.cur { background:#e8f8ee; color:var(--g); font-weight:600; }
+.acct .id { font-size:12px; color:var(--muted); }
+.grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+.pt { background:#fafafa; border:1px solid var(--line); border-radius:10px; padding:10px; text-align:center; }
+.pt .n { font-size:12px; color:#666; }
+.pt .v { font-size:17px; font-weight:700; margin-top:3px; }
+.pt .v.full { color:var(--g); }
+.task { display:flex; gap:10px; align-items:center; padding:12px; background:#fafafa; border-radius:10px; margin-bottom:14px; }
+.task .st { flex:1; font-size:14px; }
+.task .st small { display:block; color:var(--muted); margin-top:2px; font-size:12px; }
+#log { background:#1e1e1e; color:#d4d4d4; font-family:Consolas,monospace; font-size:12.5px; line-height:1.7; border-radius:10px; padding:12px 14px; height:260px; overflow-y:auto; white-space:pre-wrap; word-break:break-all; }
+.hint { font-size:12px; color:var(--muted); margin-top:10px; line-height:1.6; }
+@media (max-width:800px){ .wrap{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="nav"><div class="nav-in">
+  <div class="logo">彬</div><div class="brand">彬煤答题助手 <span style="font-weight:400;color:#999;font-size:13px">电脑端</span></div>
+  <div class="badge" id="st">未运行</div>
+</div></div>
+
+<div class="wrap">
+  <div>
+    <div class="card">
+      <h3>账号管理</h3>
+      <div class="row"><input type="text" id="acc" placeholder="输入身份证账号"><button class="pri" onclick="addAcc()">登录添加</button></div>
+      <div id="accts"></div>
+      <div class="hint">账号登录后自动保存在本机 bm_config.json，重启无需重新输入。</div>
+    </div>
+  </div>
+  <div>
+    <div class="card" style="margin-bottom:16px">
+      <h3>今日积分 <span id="pname" style="color:#1a1a1a"></span></h3>
+      <div class="grid" id="pts"></div>
+      <div class="task">
+        <div class="st">自动答题任务<small id="taskmsg">手机考试/模拟考试 不足24分自动补足（自动选试卷二）</small></div>
+        <button class="pri" id="btn" onclick="toggle()">启动</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>运行日志</h3>
+      <div id="log">等待操作…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let timer=null;
+async function api(p, body){
+  const ctl = new AbortController(); const t = setTimeout(()=>ctl.abort(), 8000);
+  try {
+    const r = await fetch(p, Object.assign({}, body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{}, {signal:ctl.signal}));
+    clearTimeout(t);
+    return r.json();
+  } catch(e){ clearTimeout(t); return {ok:false, msg:'请求超时'}; }
+}
+async function refresh(){
+  const s = await api('/api/status');
+  const st = document.getElementById('st');
+  st.textContent = s.running ? '运行中' : (s.ready?'就绪':'未运行');
+  st.className = 'badge' + (s.running?' on':'');
+  const b = document.getElementById('btn');
+  b.textContent = s.running ? '停止' : '启动';
+  document.getElementById('taskmsg').textContent = s.taskmsg || '手机考试/模拟考试 不足24分自动补足（自动选试卷二）';
+  document.getElementById('pname').textContent = s.name ? '· '+s.name : '';
+  const pts = document.getElementById('pts');
+  pts.innerHTML = (s.points||[]).map(p=>{
+    const full = p.Cur >= p.Max;
+    return `<div class="pt"><div class="n">${p.Name}</div><div class="v ${full?'full':''}">${p.Cur}/${p.Max}</div></div>`;
+  }).join('') || '<div style="color:#999;font-size:13px">暂无数据</div>';
+  const ac = document.getElementById('accts');
+  ac.innerHTML = (s.accounts||[]).map(a=>
+    `<div class="acct ${a.cur?'cur':''}" onclick="sw('${a.id}')"><span>${a.name}</span><span class="id">${a.id}</span></div>`
+  ).join('') || '<div style="color:#999;font-size:13px">暂无账号，请先添加</div>';
+  const lg = document.getElementById('log');
+  if (s.log && s.log !== lg.dataset.v){ lg.textContent = s.log; lg.dataset.v = s.log; lg.scrollTop = lg.scrollHeight; }
+}
+async function addAcc(){
+  const v = document.getElementById('acc').value.trim();
+  if(!v) return alert('请输入账号');
+  const r = await api('/api/login', {account:v});
+  if(!r.ok) return alert(r.msg||'登录失败');
+  document.getElementById('acc').value='';
+  refresh();
+}
+async function sw(id){ await api('/api/switch', {account:id}); refresh(); }
+async function toggle(){ await api('/api/toggle'); refresh(); }
+refresh(); timer = setInterval(refresh, 1500);
+</script>
+</body>
+</html>
