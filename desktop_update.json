@@ -1,7 +1,7 @@
 {
   "versionCode": 7,
   "versionName": "1.11.0",
-  "changelog": "绿色主题界面；紧凑窗口；右上角账号下拉菜单；底部状态栏（官网/更新/版本号）",
+  "changelog": "绿色主题界面；紧凑窗口；右上角账号下拉；底部状态栏",
   "exeUrl": "https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-desktop.exe",
   "force": false
 }
