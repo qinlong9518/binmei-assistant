@@ -22,7 +22,7 @@ func main() {
 		}
 	}()
 
-	// 卸载模式
+	// 卸载模式（无窗口环境，walk.MsgBox 用 nil 宿主）
 	if len(os.Args) > 1 && os.Args[1] == "/uninstall" {
 		runUninstaller()
 		return
@@ -30,17 +30,18 @@ func main() {
 
 	debugLog("进程启动 " + AppVersion)
 
-	// 安装引导：未安装 → 询问安装到系统（微信/QQ 式）→ 从安装目录重启
-	if !ensureInstalledFlow() {
-		return
-	}
-
 	debugLog("构建主窗口")
 	if err := buildMainWindow(); err != nil {
 		writeLog("bm_crash.log", "主窗口创建失败: "+err.Error())
 		os.Exit(2)
 	}
 	debugLog("主窗口就绪")
+
+	// 安装引导：未安装 → 询问安装到系统（微信/QQ 式）→ 从安装目录重启
+	// （必须在主窗口创建后：MsgBox 需要宿主窗口）
+	if !ensureInstalledFlow() {
+		return
+	}
 
 	// 后台线程
 	go uiTick()
