@@ -37,7 +37,7 @@
   }
   .brand { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 600; }
   .brand img { width: 30px; height: 30px; border-radius: 7px; }
-  .nav-links { display: flex; gap: 28px; font-size: 14.5px; color: #555; margin-left: auto; }
+  .nav-links { display: flex; gap: 28px; font-size: 14.5px; color: #555; margin-left: auto; white-space: nowrap; }
   .nav-links a { padding: 4px 2px; transition: color .2s; }
   .nav-links a:hover { color: var(--wx-green); }
   .nav-cta {
@@ -45,11 +45,21 @@
     padding: 7px 18px; border-radius: 6px; font-weight: 500;
   }
   .nav-cta:hover { background: var(--wx-green-dark); }
+  /* 手机端：隐藏中间链接，仅保留品牌 + 立即下载按钮（避免挤压换行） */
+  @media (max-width: 640px) {
+    .nav-links a:not(.nav-cta) { display: none; }
+    .nav-inner { height: 56px; padding: 0 18px; gap: 0; }
+  }
 
   /* ===== Hero ===== */
   .hero {
     text-align: center; padding: 88px 24px 72px;
     background: linear-gradient(180deg, var(--wx-green-bg) 0%, #fff 100%);
+  }
+  @media (max-width: 640px) {
+    .hero { padding: 56px 20px 52px; }
+    .hero h1 { font-size: 32px; }
+    .hero .sub { font-size: 15.5px; }
   }
   .hero h1 { font-size: 44px; font-weight: 700; letter-spacing: 1px; }
   .hero .sub {
