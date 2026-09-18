@@ -1,0 +1,53 @@
+name: desktop-ci
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "desktop/**"
+      - ".github/workflows/desktop-ci.yml"
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Build
+        run: go build -v -ldflags "-s -w -H windowsgui" -o binmei-desktop.exe ./cmd/bmwin
+
+      - name: Smoke test (create window for 6 seconds)
+        shell: pwsh
+        run: |
+          Start-Process -FilePath ".\binmei-desktop.exe" -PassThru | ForEach-Object {
+            Start-Sleep -Seconds 6
+            if ($_.HasExited) {
+              Write-Host "::error::进程提前退出 ExitCode=$($_.ExitCode)"
+              exit 1
+            } else {
+              Write-Host "WINDOW OK - 进程存活 PID=$($_.Id)"
+              Stop-Process -Id $_.Id -Force
+            }
+          }
+          if (Test-Path bm_crash.log) {
+            Write-Host "::error::崩溃日志内容:"
+            Get-Content bm_crash.log
+            exit 1
+          }
+          if (Test-Path bm_debug.log) {
+            Write-Host "调试日志:"
+            Get-Content bm_debug.log
+          }
+
+      - name: Upload exe artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binmei-desktop
+          path: desktop/binmei-desktop.exe
