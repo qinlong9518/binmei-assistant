@@ -21,25 +21,24 @@ jobs:
           go-version: "1.22"
 
       - name: Build
-        run: go build -v -ldflags "-s -w -H windowsgui" -o binmei-desktop.exe ./cmd/bmwin
+        run: |
+          go install github.com/akavel/rsrc@v0.10.2
+          $(go env GOPATH)/bin/rsrc -manifest cmd/bmwin/app.manifest -arch amd64 -o cmd/bmwin/rsrc_windows_amd64.syso
+          go build -v -ldflags "-s -w -H windowsgui" -o binmei-desktop.exe ./cmd/bmwin
 
       - name: Smoke test (create window for 6 seconds)
         shell: pwsh
         run: |
-          Start-Process -FilePath ".\binmei-desktop.exe" -PassThru | ForEach-Object {
-            Start-Sleep -Seconds 6
-            if ($_.HasExited) {
-              Write-Host "::error::进程提前退出 ExitCode=$($_.ExitCode)"
-              exit 1
-            } else {
-              Write-Host "WINDOW OK - 进程存活 PID=$($_.Id)"
-              Stop-Process -Id $_.Id -Force
-            }
-          }
-          if (Test-Path bm_crash.log) {
-            Write-Host "::error::崩溃日志内容:"
-            Get-Content bm_crash.log
+          $p = Start-Process -FilePath ".\binmei-desktop.exe" -PassThru
+          Start-Sleep -Seconds 6
+          if ($p.HasExited) {
+            Write-Host "::error::进程提前退出 ExitCode=$($p.ExitCode)"
+            if (Test-Path bm_crash.log) { Write-Host "--- 崩溃日志 ---"; Get-Content bm_crash.log }
+            if (Test-Path bm_debug.log) { Write-Host "--- 调试日志 ---"; Get-Content bm_debug.log }
             exit 1
+          } else {
+            Write-Host "WINDOW OK - 进程存活 PID=$($p.Id)"
+            Stop-Process -Id $p.Id -Force
           }
           if (Test-Path bm_debug.log) {
             Write-Host "调试日志:"
