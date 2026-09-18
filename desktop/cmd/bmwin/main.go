@@ -350,8 +350,6 @@ func buildMainWindow() error {
 		AssignTo: &mw,
 		Title:    "彬煤答题助手",
 		MinSize:  Size{Width: 470, Height: 620},
-		MaxSize:  Size{Width: 470, Height: 620},
-		Icon:     "2", // 从 exe 资源取（manifest 同包 syso 无图标时回退系统默认）
 		Layout:   VBox{Margins: Margins{Left: 12, Top: 10, Right: 12, Bottom: 10}, Spacing: 8},
 		Children: []Widget{
 			Composite{
