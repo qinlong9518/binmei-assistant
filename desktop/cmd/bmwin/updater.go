@@ -96,7 +96,18 @@ func downloadTo(url, dst string, progress func(int)) (bool, error) {
 	}
 }
 
-// selfReplace 自替换：改名旧 exe → 放入新 exe → 启动新进程 → 退出
+// silentCheckUpdate 启动后静默检查（仅在状态栏提示，不弹窗）
+func silentCheckUpdate() {
+	meta, err := fetchUpdateMeta()
+	if err != nil || meta == nil {
+		return
+	}
+	if meta.VersionCode > AppVersionCode {
+		setStatus("发现新版本 v" + meta.VersionName + "，可点「检查更新」安装")
+	}
+}
+
+// walkMsgBox 辅助（供更新流程确认）
 func selfReplace(newExe string) error {
 	exe, err := os.Executable()
 	if err != nil {
