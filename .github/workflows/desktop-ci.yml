@@ -20,9 +20,10 @@ jobs:
         with:
           go-version: "1.22"
 
-      - name: Build (icon + versioninfo + manifest)
+      - name: Build (rsrc: icon+manifest; goversioninfo: version block)
         run: |
-          go run github.com/josephspurrier/goversioninfo/cmd/goversioninfo@v1.4.0 -platform-specific -icon cmd/bmwin/app.ico -manifest cmd/bmwin/app.manifest -o cmd/bmwin/rsrc_windows_amd64.syso cmd/bmwin/versioninfo.json
+          go run github.com/akavel/rsrc@v0.10.2 -ico cmd/bmwin/app.ico -manifest cmd/bmwin/app.manifest -arch amd64 -o cmd/bmwin/rsrc_windows_amd64.syso
+          go run github.com/josephspurrier/goversioninfo/cmd/goversioninfo@v1.4.0 -platform-specific -o cmd/bmwin/rsrc_version_windows_amd64.syso cmd/bmwin/versioninfo.json
           go build -v -trimpath -ldflags "-s -w -H windowsgui" -o binmei-desktop.exe ./cmd/bmwin
 
       - name: Smoke test (window + version info)
