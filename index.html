@@ -3,153 +3,311 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>彬煤答题助手 - 官网</title>
-<meta name="description" content="彬煤安培365自动答题助手：自动答题、自动开考、积分监控、账号切换，支持鸿蒙卓易通。">
+<title>彬煤答题助手 - 官方下载</title>
+<meta name="description" content="彬煤答题助手官方下载：彬煤安培365自动答题助手，自动答题、智能开考、积分监控、多账号切换。支持 Android 12+ 与鸿蒙卓易通。">
 <style>
   :root {
-    --green: #3ED588;
-    --green-dark: #1d892f;
-    --green-deep: #0f5c25;
-    --bg: #0d1512;
-    --card: #14201b;
-    --text: #e8f5ee;
-    --muted: #93a89d;
-    --border: #1f3229;
+    --wx-green: #07C160;
+    --wx-green-dark: #06AD56;
+    --wx-green-bg: #f0fbf5;
+    --text: #1a1a1a;
+    --muted: #888;
+    --line: #e5e5e5;
+    --bg: #fff;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
-    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.6;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
   }
-  a { color: var(--green); text-decoration: none; }
-  .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+  a { text-decoration: none; color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
 
-  /* Hero */
+  /* ===== 顶部导航（微信官网同款） ===== */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,.92); backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner {
+    max-width: 1080px; margin: 0 auto; padding: 0 24px;
+    height: 60px; display: flex; align-items: center; gap: 40px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 600; }
+  .brand img { width: 30px; height: 30px; border-radius: 7px; }
+  .nav-links { display: flex; gap: 28px; font-size: 14.5px; color: #555; margin-left: auto; }
+  .nav-links a { padding: 4px 2px; transition: color .2s; }
+  .nav-links a:hover { color: var(--wx-green); }
+  .nav-cta {
+    background: var(--wx-green); color: #fff !important;
+    padding: 7px 18px; border-radius: 6px; font-weight: 500;
+  }
+  .nav-cta:hover { background: var(--wx-green-dark); }
+
+  /* ===== Hero ===== */
   .hero {
-    text-align: center;
-    padding: 64px 0 48px;
-    background: radial-gradient(ellipse at top, rgba(62,213,136,.12), transparent 60%);
+    text-align: center; padding: 88px 24px 72px;
+    background: linear-gradient(180deg, var(--wx-green-bg) 0%, #fff 100%);
   }
-  .logo {
-    width: 96px; height: 96px; border-radius: 22px;
-    box-shadow: 0 8px 32px rgba(62,213,136,.25);
+  .hero h1 { font-size: 44px; font-weight: 700; letter-spacing: 1px; }
+  .hero .sub {
+    font-size: 18px; color: var(--muted); margin: 18px 0 8px; font-weight: 300;
   }
-  h1 { font-size: 34px; margin: 18px 0 6px; }
-  .slogan { color: var(--muted); font-size: 16px; margin-bottom: 6px; }
-  .ver {
-    display: inline-block; margin: 10px 0 26px; padding: 3px 12px;
-    border: 1px solid var(--border); border-radius: 999px;
-    color: var(--green); font-size: 13px; background: rgba(62,213,136,.06);
+  .hero .ver-tag {
+    display: inline-block; margin-top: 10px; padding: 4px 14px;
+    background: #fff; border: 1px solid var(--wx-green); border-radius: 999px;
+    color: var(--wx-green); font-size: 13px;
   }
-  .btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .hero-btns { margin-top: 36px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
   .btn {
-    display: inline-block; padding: 13px 26px; border-radius: 12px;
-    font-size: 15px; font-weight: 600; transition: .2s;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 36px; border-radius: 8px; font-size: 16.5px; font-weight: 500;
+    transition: all .2s;
   }
-  .btn-primary { background: var(--green); color: #06281a; }
-  .btn-primary:hover { background: #55e69c; transform: translateY(-1px); }
-  .btn-ghost { border: 1px solid var(--border); color: var(--text); background: var(--card); }
-  .btn-ghost:hover { border-color: var(--green); color: var(--green); }
-  .dl-note { color: var(--muted); font-size: 12.5px; margin-top: 14px; }
+  .btn-green { background: var(--wx-green); color: #fff; box-shadow: 0 6px 20px rgba(7,193,96,.28); }
+  .btn-green:hover { background: var(--wx-green-dark); transform: translateY(-2px); box-shadow: 0 10px 26px rgba(7,193,96,.34); }
+  .btn-plain { background: #fff; border: 1px solid #d9d9d9; color: var(--text); }
+  .btn-plain:hover { border-color: var(--wx-green); color: var(--wx-green); }
+  .hero-note { margin-top: 18px; color: #aaa; font-size: 13px; }
 
-  /* Sections */
-  section { padding: 40px 0; }
-  h2 { font-size: 22px; margin-bottom: 20px; text-align: center; }
-  h2::after { content: ""; display: block; width: 36px; height: 3px; background: var(--green); margin: 10px auto 0; border-radius: 2px; }
+  /* ===== 平台下载分区 ===== */
+  .dl-section { padding: 70px 0 30px; }
+  .sec-title { text-align: center; font-size: 30px; font-weight: 700; }
+  .sec-sub { text-align: center; color: var(--muted); margin: 10px 0 44px; font-size: 15px; }
 
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
-  .card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 14px; padding: 20px;
+  .dl-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 28px;
   }
-  .card .ico { font-size: 26px; }
-  .card h3 { font-size: 16px; margin: 8px 0 6px; color: var(--green); }
-  .card p { color: var(--muted); font-size: 14px; }
+  @media (max-width: 720px) { .dl-grid { grid-template-columns: 1fr; } }
 
-  /* Install steps */
-  .steps { counter-reset: step; }
-  .step {
-    position: relative; padding: 14px 16px 14px 56px;
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; margin-bottom: 10px; font-size: 14.5px;
+  .dl-card {
+    border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+    transition: box-shadow .25s, transform .25s; background: #fff;
   }
-  .step::before {
-    counter-increment: step; content: counter(step);
-    position: absolute; left: 16px; top: 14px;
-    width: 26px; height: 26px; border-radius: 50%;
-    background: var(--green); color: #06281a;
-    font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 14px;
+  .dl-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,.08); transform: translateY(-3px); }
+  .dl-card .head {
+    padding: 26px 28px 20px; display: flex; align-items: center; gap: 16px;
+    border-bottom: 1px solid #f2f2f2;
   }
-  .step b { color: var(--text); }
-  .note { color: var(--muted); font-size: 13px; margin-top: 12px; }
+  .plat-ico {
+    width: 52px; height: 52px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center; font-size: 26px; color: #fff;
+  }
+  .ico-android { background: linear-gradient(135deg, #07C160, #05a350); }
+  .ico-pc { background: linear-gradient(135deg, #5b8def, #3a6fd8); }
+  .dl-card .head h3 { font-size: 19px; }
+  .dl-card .head p { font-size: 13px; color: var(--muted); }
+  .dl-card .body { padding: 22px 28px 26px; }
+  .dl-card .meta { font-size: 13.5px; color: var(--muted); margin-bottom: 18px; }
+  .dl-card .meta b { color: var(--text); font-weight: 600; }
+  .dl-btn {
+    display: block; text-align: center; width: 100%;
+    padding: 13px 0; border-radius: 8px; font-size: 15.5px; font-weight: 500;
+    background: var(--wx-green); color: #fff; transition: .2s; margin-bottom: 10px;
+  }
+  .dl-btn:hover { background: var(--wx-green-dark); }
+  .dl-mirror {
+    display: block; text-align: center; width: 100%;
+    padding: 11px 0; border-radius: 8px; font-size: 14px;
+    border: 1px solid #e0e0e0; color: #666; transition: .2s;
+  }
+  .dl-mirror:hover { border-color: var(--wx-green); color: var(--wx-green); }
+  .qr-slot {
+    margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--line);
+    font-size: 12.5px; color: #aaa; text-align: center;
+  }
 
-  /* Changelog */
-  .log { font-size: 14.5px; }
-  .log li { margin: 6px 0 6px 18px; color: var(--muted); }
-  .log b { color: var(--text); }
-
-  footer {
-    border-top: 1px solid var(--border);
-    text-align: center; padding: 26px 0 40px;
-    color: var(--muted); font-size: 13px;
+  /* ===== 功能特性 ===== */
+  .feat-section { padding: 70px 0; background: #fafafa; }
+  .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  @media (max-width: 860px) { .feat-grid { grid-template-columns: 1fr; } }
+  .feat {
+    background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 30px 26px;
+    transition: .25s;
   }
-  footer a { color: var(--green); }
+  .feat:hover { box-shadow: 0 10px 34px rgba(0,0,0,.07); }
+  .feat .fi {
+    width: 46px; height: 46px; border-radius: 12px; background: var(--wx-green-bg);
+    display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 16px;
+  }
+  .feat h3 { font-size: 16.5px; margin-bottom: 8px; }
+  .feat p { font-size: 14px; color: var(--muted); }
+
+  /* ===== 安装指引 ===== */
+  .guide-section { padding: 70px 0; }
+  .guide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  @media (max-width: 720px) { .guide-grid { grid-template-columns: 1fr; } }
+  .guide-col h3 { font-size: 18px; margin-bottom: 18px; padding-left: 12px; border-left: 4px solid var(--wx-green); }
+  .guide-col ol { list-style: none; }
+  .guide-col li {
+    position: relative; padding: 0 0 16px 34px; font-size: 14.5px; color: #444;
+  }
+  .guide-col li::before {
+    content: attr(data-n); position: absolute; left: 0; top: 1px;
+    width: 22px; height: 22px; border-radius: 50%; background: var(--wx-green); color: #fff;
+    font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: 600;
+  }
+  .guide-col li::after {
+    content: ""; position: absolute; left: 10.5px; top: 26px; bottom: 2px; width: 1px; background: var(--line);
+  }
+  .guide-col li:last-child::after { display: none; }
+
+  /* ===== 页脚 ===== */
+  footer { background: #fbfbfb; border-top: 1px solid var(--line); padding: 34px 0; text-align: center; }
+  footer p { color: #999; font-size: 13px; margin: 4px 0; }
+  footer a { color: var(--wx-green); }
 </style>
 </head>
 <body>
 
-<div class="hero wrap">
-  <img class="logo" src="app/src/main/ic_launcher-playstore.png" alt="彬煤答题助手">
+<!-- 顶部导航 -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#">
+      <img src="app/src/main/ic_launcher-playstore.png" alt="logo">
+      彬煤答题助手
+    </a>
+    <div class="nav-links">
+      <a href="#features">功能</a>
+      <a href="#download">下载</a>
+      <a href="#guide">安装指引</a>
+      <a class="nav-cta" href="#download">立即下载</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
   <h1>彬煤答题助手</h1>
-  <p class="slogan">彬煤安培365 · 自动答题 / 自动开考 / 积分监控，一部手机全搞定</p>
-  <span class="ver">当前版本 v1.7.5 · 支持 Android 12+ 与鸿蒙卓易通</span>
-  <div class="btns">
-    <a class="btn btn-primary" href="https://github.com/qinlong9518/binmei-assistant/releases/latest/download/app-release.apk">⬇ 下载最新版 APK</a>
-    <a class="btn btn-ghost" href="https://ghfast.top/https://github.com/qinlong9518/binmei-assistant/releases/latest/download/app-release.apk">国内镜像加速</a>
-    <a class="btn btn-ghost" href="https://github.com/qinlong9518/binmei-assistant/releases">全部版本</a>
+  <p class="sub">彬煤安培365 · 自动答题 · 智能开考 · 积分监控</p>
+  <p class="sub" style="margin-top:2px; font-size:15px">一部手机，学习积分自动搞定</p>
+  <span class="ver-tag">v1.7.5 · 支持 Android 12+ / 鸿蒙卓易通</span>
+  <div class="hero-btns">
+    <a class="btn btn-green" href="#download">立即下载</a>
+    <a class="btn btn-plain" href="https://github.com/qinlong9518/binmei-assistant">查看源码</a>
   </div>
-  <p class="dl-note">手机浏览器打开本页点击下载即可 · 安装时需允许「安装未知应用」</p>
-</div>
+  <p class="hero-note">完全本地运行 · 不上传任何数据 · 免费使用</p>
+</header>
 
-<section class="wrap">
-  <h2>功能一览</h2>
-  <div class="grid">
-    <div class="card"><div class="ico">📝</div><h3>全自动答题</h3><p>进入试卷自动作答、自动翻题、答满自动交卷；题数可跟随试卷下发数量。</p></div>
-    <div class="card"><div class="ico">🎯</div><h3>智能自动开考</h3><p>「手机考试」「模拟考试」积分分别判断，未满 24 分自动选试卷二开考，考完接力下一项。</p></div>
-    <div class="card"><div class="ico">📊</div><h3>实时积分面板</h3><p>底部常驻今日积分明细，两行三列一目了然，随积分轮询自动刷新。</p></div>
-    <div class="card"><div class="ico">👥</div><h3>多账号切换</h3><p>电源菜单显示人名（不暴露证件号），最多 5 个账号快速切换，支持退出登录。</p></div>
-    <div class="card"><div class="ico">⚙️</div><h3>参数随心调</h3><p>答题速度、等待、锁定、各轮询间隔、总题数、自动题数开关，设置页实时生效。</p></div>
-    <div class="card"><div class="ico">🔄</div><h3>在线自更新</h3><p>后台下载 + 通知栏进度，完成后自动弹出安装；多镜像加速，国内秒下。</p></div>
+<!-- 平台下载 -->
+<section class="dl-section wrap" id="download">
+  <h2 class="sec-title">下载</h2>
+  <p class="sec-sub">选择你的设备平台，获取最新版本</p>
+  <div class="dl-grid">
+
+    <!-- 手机端 -->
+    <div class="dl-card">
+      <div class="head">
+        <div class="plat-ico ico-android">🤖</div>
+        <div>
+          <h3>手机端 Android</h3>
+          <p>含鸿蒙系统（卓易通环境）</p>
+        </div>
+      </div>
+      <div class="body">
+        <p class="meta">最新版本 <b>v1.7.5</b> · 大小 <b>10.8 MB</b> · 需要 <b>Android 12+</b></p>
+        <a class="dl-btn" href="https://github.com/qinlong9518/binmei-assistant/releases/latest/download/app-release.apk">⬇ 下载 APK（官方源）</a>
+        <a class="dl-mirror" href="https://ghfast.top/https://github.com/qinlong9518/binmei-assistant/releases/latest/download/app-release.apk">国内镜像加速下载</a>
+        <p class="qr-slot">手机浏览器打开本页，点击上方按钮直接下载安装</p>
+      </div>
+    </div>
+
+    <!-- 电脑端 -->
+    <div class="dl-card">
+      <div class="head">
+        <div class="plat-ico ico-pc">💻</div>
+        <div>
+          <h3>电脑端 Windows / macOS</h3>
+          <p>通过安卓模拟器运行（如 MuMu、雷电、BlueStacks）</p>
+        </div>
+      </div>
+      <div class="body">
+        <p class="meta">使用同一 APK · 在模拟器中 <b>Android 12+</b> 环境运行</p>
+        <a class="dl-btn" href="https://github.com/qinlong9518/binmei-assistant/releases/latest/download/app-release.apk">⬇ 下载 APK（官方源）</a>
+        <a class="dl-mirror" href="https://ghfast.top/https://github.com/qinlong9518/binmei-assistant/releases/latest/download/app-release.apk">国内镜像加速下载</a>
+        <p class="qr-slot">下载后拖入模拟器即可安装；推荐 MuMu 12 或雷电 9</p>
+      </div>
+    </div>
+
   </div>
 </section>
 
-<section class="wrap">
-  <h2>安装步骤</h2>
-  <div class="steps">
-    <div class="step">点击上方 <b>「下载最新版 APK」</b>（国内网络建议用镜像加速链接）。</div>
-    <div class="step">下载完成后在系统弹出的安装界面点 <b>「安装」</b>；首次安装需在设置中允许<b>「安装未知应用」</b>。</div>
-    <div class="step">打开 App，输入<b>账号</b>登录（密码与验证码已内置）。</div>
-    <div class="step">进入主页面即自动开始：积分不足时询问是否<b>自动开考</b>，之后全自动。</div>
+<!-- 功能特性 -->
+<section class="feat-section" id="features">
+  <div class="wrap">
+    <h2 class="sec-title">核心功能</h2>
+    <p class="sec-sub">不只是自动答题</p>
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="fi">📝</div>
+        <h3>全自动答题</h3>
+        <p>进入试卷自动作答、翻题、交卷；题数可跟随试卷下发数量，或按设置固定。</p>
+      </div>
+      <div class="feat">
+        <div class="fi">🎯</div>
+        <h3>智能自动开考</h3>
+        <p>手机考试、模拟考试积分分别判断，未满自动选试卷二开考，考完接力下一项，全天无人值守。</p>
+      </div>
+      <div class="feat">
+        <div class="fi">📊</div>
+        <h3>实时积分面板</h3>
+        <p>今日积分明细常驻底部，两行三列清晰展示，随轮询自动刷新。</p>
+      </div>
+      <div class="feat">
+        <div class="fi">👥</div>
+        <h3>多账号切换</h3>
+        <p>下拉菜单显示人名而非证件号，最多 5 个账号一键切换，切换即重新登录。</p>
+      </div>
+      <div class="feat">
+        <div class="fi">⚙️</div>
+        <h3>参数随心调</h3>
+        <p>答题速度、等待、锁定、各轮询频率、总题数策略，全部可视化设置，实时生效。</p>
+      </div>
+      <div class="feat">
+        <div class="fi">🔄</div>
+        <h3>在线自更新</h3>
+        <p>后台下载 + 通知栏进度，完成后自动弹出安装；多镜像加速，国内畅通。</p>
+      </div>
+    </div>
   </div>
-  <p class="note">· 鸿蒙系统请通过「卓易通」安装运行；此前安装过旧版本如提示签名冲突，先卸载再装。<br>· 应用完全本地运行，不上传任何数据到第三方服务器。</p>
 </section>
 
-<section class="wrap">
-  <h2>更新日志（v1.7.5）</h2>
-  <div class="card">
-    <ul class="log">
-      <li><b>兼容性</b>：最低系统要求降至 Android 12，鸿蒙卓易通可正常安装</li>
-      <li><b>签名</b>：v1 + v2 双签名方案，兼容各类安装器</li>
-      <li><b>历史</b>：自动题数开关、账号人名显示、紧凑菜单、后台下载更新、积分面板两行三列、速度调节范围优化……</li>
-    </ul>
+<!-- 安装指引 -->
+<section class="guide-section wrap" id="guide">
+  <h2 class="sec-title" style="margin-bottom:40px">安装指引</h2>
+  <div class="guide-grid">
+    <div class="guide-col">
+      <h3>📱 手机端（Android / 鸿蒙）</h3>
+      <ol>
+        <li data-n="1">手机浏览器打开本页，点击「下载 APK」（网络不畅用镜像链接）。</li>
+        <li data-n="2">下载完成后点击系统弹出的安装界面「安装」；首次安装需允许「安装未知应用」。</li>
+        <li data-n="3">打开 App，输入账号登录（密码与验证码已内置，无需输入）。</li>
+        <li data-n="4">进入主页后积分不足会询问「是否自动答题」，确认后全自动运行。</li>
+        <li data-n="5">鸿蒙设备：通过「卓易通」安装运行；曾装旧版提示签名冲突时先卸载。</li>
+      </ol>
+    </div>
+    <div class="guide-col">
+      <h3>💻 电脑端（Windows / macOS）</h3>
+      <ol>
+        <li data-n="1">下载并安装安卓模拟器（推荐 MuMu 12、雷电 9 或 BlueStacks 5）。</li>
+        <li data-n="2">点击上方「电脑端下载」获取 APK 文件。</li>
+        <li data-n="3">将 APK 拖入模拟器窗口，或在模拟器中「安装本地 APK」。</li>
+        <li data-n="4">模拟器内打开 App，登录账号，操作与手机端完全一致。</li>
+        <li data-n="5">建议模拟器系统设为 Android 12 及以上，性能分配 2 核 / 2GB 起。</li>
+      </ol>
+    </div>
   </div>
 </section>
 
+<!-- 页脚 -->
 <footer>
-  <p><a href="https://github.com/qinlong9518/binmei-assistant">GitHub 仓库</a> · 问题反馈请提交 Issue</p>
-  <p style="margin-top:6px">本工具仅供学习交流，请合理使用。</p>
+  <div class="wrap">
+    <p><a href="https://github.com/qinlong9518/binmei-assistant">GitHub 仓库</a> · <a href="https://github.com/qinlong9518/binmei-assistant/releases">历史版本</a> · 问题反馈请提交 Issue</p>
+    <p>本工具仅供学习交流使用，请合理合规使用。</p>
+    <p style="margin-top:10px; color:#bbb">© 2026 彬煤答题助手</p>
+  </div>
 </footer>
 
 </body>
