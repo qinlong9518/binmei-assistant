@@ -15,6 +15,7 @@ import (
 
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
+	"github.com/lxn/win"
 )
 
 // ---------- 配置（存安装目录，卸载时一并清理） ----------
@@ -316,18 +317,18 @@ func upsertAccount(id, name string) {
 }
 
 // ---------- 主窗口 ----------
-
 var (
 	mw          *walk.MainWindow
+	userLink    *walk.LinkLabel
 	verLabel    *walk.Label
-	userLabel   *walk.Label
+	siteLink    *walk.LinkLabel
+	updLink     *walk.LinkLabel
 	ptLabels    [6]*walk.Label
 	taskLabel   *walk.Label
 	btnToggle   *walk.PushButton
 	logEdit     *walk.TextEdit
-	btnUpdate   *walk.PushButton
-	statusLabel *walk.Label
 	pb          *walk.ProgressBar
+	statusLabel *walk.Label
 
 	uiLock     bool
 	appQuiting bool
@@ -349,62 +350,162 @@ func buildMainWindow() error {
 	return (MainWindow{
 		AssignTo: &mw,
 		Title:    "彬煤答题助手",
-		MinSize:  Size{Width: 470, Height: 620},
-		Layout:   VBox{Margins: Margins{Left: 12, Top: 10, Right: 12, Bottom: 10}, Spacing: 8},
+		MinSize:  Size{Width: 400, Height: 590},
+		Layout:   VBox{MarginsZero: true, Spacing: 0},
 		Children: []Widget{
+			// 绿色顶栏：品牌 + 账号（点击管理）
 			Composite{
-				Layout: HBox{MarginsZero: true},
+				Layout:     HBox{Margins: Margins{Left: 14, Top: 12, Right: 14, Bottom: 12}},
+				Background: SolidColorBrush{Color: walk.RGB(7, 193, 96)},
 				Children: []Widget{
-					Label{AssignTo: &verLabel, Text: "彬煤答题助手 v" + AppVersion,
-						Font: Font{PointSize: 12, Bold: true}},
+					Label{Text: "彬煤答题助手", TextColor: walk.RGB(255, 255, 255),
+						Font: Font{PointSize: 13, Bold: true}},
 					HSpacer{},
-					Label{AssignTo: &userLabel, Text: "", TextColor: walk.RGB(7, 193, 96)},
+					LinkLabel{AssignTo: &userLink, Text: "未登录 ▼",
+						OnMouseDown: func(x, y int, btn walk.MouseButton) {
+							if btn == walk.LeftButton {
+								onAccountManager()
+							}
+						}},
 				},
 			},
-			GroupBox{
-				Title:  "今日积分",
-				Layout: Grid{Columns: 3, Spacing: 6},
-				Children: []Widget{
-					Label{AssignTo: &ptLabels[0], Text: "签到  -"},
-					Label{AssignTo: &ptLabels[1], Text: "知识学习  -"},
-					Label{AssignTo: &ptLabels[2], Text: "手机考试  -"},
-					Label{AssignTo: &ptLabels[3], Text: "模拟考试  -"},
-					Label{AssignTo: &ptLabels[4], Text: "手机练习  -"},
-					Label{AssignTo: &ptLabels[5], Text: "视频学习  -"},
-				},
-			},
-			GroupBox{
-				Title:  "自动答题（不足24分自动补足·选试卷二）",
-				Layout: HBox{MarginsZero: true, Spacing: 8},
-				Children: []Widget{
-					Label{AssignTo: &taskLabel, Text: "⚪ 待启动"},
-					PushButton{AssignTo: &btnToggle, Text: "启动", OnClicked: onToggleClicked},
-				},
-			},
-			GroupBox{
-				Title:  "运行日志",
-				Layout: VBox{MarginsZero: true},
-				Children: []Widget{
-					TextEdit{AssignTo: &logEdit, ReadOnly: true, VScroll: true, MinSize: Size{Height: 170}},
-				},
-			},
+			// 主体
 			Composite{
-				Layout: HBox{MarginsZero: true, Spacing: 8},
+				Layout: VBox{Margins: Margins{Left: 12, Top: 10, Right: 12, Bottom: 4}, Spacing: 8},
 				Children: []Widget{
-					PushButton{AssignTo: &btnUpdate, Text: "检查更新", OnClicked: onCheckUpdateClicked},
-					PushButton{Text: "官网", OnClicked: func() { openURL(OfficialSite) }},
-					PushButton{Text: "账号管理", OnClicked: onAccountManager},
+					GroupBox{
+						Title:  "今日积分",
+						Layout: Grid{Columns: 3, Spacing: 6},
+						Children: []Widget{
+							Label{AssignTo: &ptLabels[0], Text: "签到  -"},
+							Label{AssignTo: &ptLabels[1], Text: "知识学习  -"},
+							Label{AssignTo: &ptLabels[2], Text: "手机考试  -"},
+							Label{AssignTo: &ptLabels[3], Text: "模拟考试  -"},
+							Label{AssignTo: &ptLabels[4], Text: "手机练习  -"},
+							Label{AssignTo: &ptLabels[5], Text: "视频学习  -"},
+						},
+					},
+					GroupBox{
+						Title:  "自动答题（不足24分自动补足·选试卷二）",
+						Layout: HBox{MarginsZero: true, Spacing: 8},
+						Children: []Widget{
+							Label{AssignTo: &taskLabel, Text: "⚪ 待登录"},
+							PushButton{AssignTo: &btnToggle, Text: "启动", OnClicked: onToggleClicked},
+						},
+					},
+					GroupBox{
+						Title:  "运行日志",
+						Layout: VBox{MarginsZero: true},
+						Children: []Widget{
+							TextEdit{AssignTo: &logEdit, ReadOnly: true, VScroll: true, MinSize: Size{Height: 170}},
+						},
+					},
 					ProgressBar{AssignTo: &pb, MinValue: 0, MaxValue: 100, Visible: false},
-					Label{AssignTo: &statusLabel, Text: ""},
+				},
+			},
+			// 底部状态栏：官网 | 检查更新 | 版本号（右下）
+			Composite{
+				Layout: HBox{Margins: Margins{Left: 12, Top: 2, Right: 12, Bottom: 8}, Spacing: 12},
+				Children: []Widget{
+					LinkLabel{AssignTo: &siteLink, Text: "官网",
+						OnMouseUp: func(x, y int, btn walk.MouseButton) {
+							if btn == walk.LeftButton {
+								openURL(OfficialSite)
+							}
+						}},
+					LinkLabel{AssignTo: &updLink, Text: "检查更新",
+						OnMouseUp: func(x, y int, btn walk.MouseButton) {
+							if btn == walk.LeftButton {
+								onCheckUpdateClicked()
+							}
+						}},
+					HSpacer{},
+					Label{AssignTo: &verLabel, Text: "v" + AppVersion,
+						TextColor: walk.RGB(150, 150, 150)},
 				},
 			},
 		},
 	}).Create()
 }
+// ---------- 账号菜单（右上角名字点击 → 下拉） ----------
+
+func onAccountManager() {
+	// 右上角名字点击 → walk 标准弹出菜单
+	cur := "未登录"
+	var selID string
+	if c := rtClient(); c != nil {
+		cur = c.Name + "（" + c.Account + "）"
+		selID = c.Account
+	}
+	pm, err := walk.NewMenu()
+	if err != nil {
+		return
+	}
+	defer pm.Dispose()
+	acts := pm.Actions()
+	// 当前账号（置灰）
+	actCur := walk.NewAction()
+	actCur.SetText("当前：" + cur)
+	actCur.SetEnabled(false)
+	acts.Add(actCur)
+	// 其他账号（可切换）
+	for _, a := range cfg.Accounts {
+		if a.ID == selID {
+			continue
+		}
+		aa := a
+		act := walk.NewAction()
+		act.SetText("切换 " + a.Name)
+		act.Triggered().Attach(func() {
+			go func(acc Account) {
+				setStatus("切换中…")
+				c := bm.NewClient()
+				if err := c.Login(acc.ID, acc.Pwd); err == nil {
+					cfg.Last = acc.ID
+					saveConfig(cfg)
+					rt.mu.Lock()
+					rt.client = c
+					rt.mu.Unlock()
+					logf("🔄 已切换: %s（%s）", c.Name, acc.ID)
+					setStatus("")
+				} else {
+					logf("❌ 切换失败: %v", err)
+					setStatus("切换失败")
+				}
+			}(aa)
+		})
+		acts.Add(act)
+	}
+	acts.Add(walk.NewSeparatorAction())
+	actMgmt := walk.NewAction()
+	actMgmt.SetText("账号管理（删除记录）…")
+	actMgmt.Triggered().Attach(onAccountManagerDialog)
+	acts.Add(actMgmt)
+	// 在窗口右上（用户名下方）弹出：SetContextMenu + 模拟右键消息
+	if p := userMenuPos(); p != nil {
+		win.SetForegroundWindow(mw.Handle())
+		win.SendMessage(mw.Handle(), win.WM_CONTEXTMENU,
+			uintptr(mw.Handle()), uintptr(win.MAKELONG(uint16(p.X), uint16(p.Y))))
+	}
+	// 注册为窗口 context menu（WM_CONTEXTMENU 触发时 walk 会弹出它）
+	mw.SetContextMenu(pm)
+}
+
+// userMenuPos 用户名下方的屏幕坐标
+func userMenuPos() *walk.Point {
+	if mw == nil {
+		return nil
+	}
+	var rect win.RECT
+	if !win.GetWindowRect(mw.Handle(), &rect) {
+		return nil
+	}
+	return &walk.Point{X: int(rect.Right) - 170, Y: int(rect.Top) + 55}
+}
 
 // ---------- 账号管理小窗（查看/切换/删除） ----------
 
-func onAccountManager() {
+func onAccountManagerDialog() {
 	var dlg *walk.Dialog
 	var list *walk.ListBox
 	var okPB, cancelPB *walk.PushButton
@@ -539,62 +640,46 @@ func onToggleClicked() {
 }
 
 func onCheckUpdateClicked() {
-	mw.Synchronize(func() { btnUpdate.SetEnabled(false) })
 	setStatus("检查更新中…")
 	go func() {
 		meta, err := fetchUpdateMeta()
 		if err != nil {
-			mw.Synchronize(func() {
-				btnUpdate.SetEnabled(true)
-				statusLabel.SetText("检查失败：网络不可达")
-			})
+			setStatus("检查失败：网络不可达")
 			return
 		}
 		if meta.VersionCode <= AppVersionCode {
-			mw.Synchronize(func() {
-				btnUpdate.SetEnabled(true)
-				statusLabel.SetText("已是最新版本 v" + AppVersion)
-			})
+			setStatus("已是最新版本 v" + AppVersion)
 			return
 		}
 		if !walkMsgBoxYesNo("发现更新",
 			"发现新版本 v"+meta.VersionName+"，是否下载安装？\n\n更新内容：\n"+meta.Changelog) {
-			mw.Synchronize(func() { btnUpdate.SetEnabled(true) })
+			setStatus("")
 			return
 		}
 		mw.Synchronize(func() {
 			pb.SetVisible(true)
 			pb.SetValue(0)
-			statusLabel.SetText("下载 v" + meta.VersionName + "…")
 		})
+		setStatus("下载 v" + meta.VersionName + "…")
 		tmp, err := downloadExe(meta.ExeURL, func(p int) {
 			mw.Synchronize(func() { pb.SetValue(p) })
 		})
 		if err != nil {
-			mw.Synchronize(func() {
-				btnUpdate.SetEnabled(true)
-				pb.SetVisible(false)
-				statusLabel.SetText("下载失败: " + err.Error())
-			})
+			mw.Synchronize(func() { pb.SetVisible(false) })
+			setStatus("下载失败: " + err.Error())
 			return
 		}
-		// 已安装场景：静默自替换；未安装（便携）场景：提示安装
+		// 已安装场景：静默自替换；未安装（便携）场景：提示重启生效
 		if isInstalled() {
-			mw.Synchronize(func() { statusLabel.SetText("安装更新…") })
+			setStatus("安装更新…")
 			if err := selfReplace(tmp); err != nil {
-				mw.Synchronize(func() {
-					btnUpdate.SetEnabled(true)
-					pb.SetVisible(false)
-					statusLabel.SetText("更新失败: " + err.Error())
-				})
+				mw.Synchronize(func() { pb.SetVisible(false) })
+				setStatus("更新失败: " + err.Error())
 			}
 			return
 		}
-		mw.Synchronize(func() {
-			btnUpdate.SetEnabled(true)
-			pb.SetVisible(false)
-			statusLabel.SetText("已下载，重启后生效")
-		})
+		mw.Synchronize(func() { pb.SetVisible(false) })
+		setStatus("已下载，重启后生效")
 	}()
 }
 
@@ -632,7 +717,9 @@ func updateUI() {
 	}
 
 	if c := client; c != nil {
-		userLabel.SetText("👤 " + c.Name)
+		userLink.SetText("👤 " + c.Name + " ▼")
+	} else {
+		userLink.SetText("未登录 ▼")
 	}
 
 	if running {
