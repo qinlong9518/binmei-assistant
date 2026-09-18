@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -18,7 +17,7 @@ import (
 	. "github.com/lxn/walk/declarative"
 )
 
-// ---------- 配置 ----------
+// ---------- 配置（存安装目录，卸载时一并清理） ----------
 
 type Account struct {
 	ID   string `json:"id"`
@@ -32,21 +31,38 @@ type Config struct {
 }
 
 func cfgPath() string {
-	if exe, err := os.Executable(); err == nil {
-		return filepath.Join(filepath.Dir(exe), "bm_config.json")
-	}
-	return "bm_config.json"
+	return filepath.Join(installDir(), "bm_config.json")
 }
 
+// loadConfig 兼容旧版（浏览器版/便携版）配置迁移
 func loadConfig() *Config {
 	c := &Config{}
+	// 1) 新位置：安装目录
 	if b, err := os.ReadFile(cfgPath()); err == nil {
 		json.Unmarshal(b, c)
+		return c
+	}
+	// 2) 旧位置：exe 同目录（便携版/浏览器版遗留）
+	if exe, err := os.Executable(); err == nil {
+		old := filepath.Join(filepath.Dir(exe), "bm_config.json")
+		if b, err := os.ReadFile(old); err == nil {
+			if json.Unmarshal(b, c) == nil && len(c.Accounts) > 0 {
+				return c // 安装流程里会迁移到新位置
+			}
+		}
+	}
+	// 3) 兼容安装目录存在但文件在旧 exe 旁的情况
+	if _, err := os.Stat(installedExePath()); err == nil {
+		old := filepath.Join(filepath.Dir(installedExePath()), "bm_config.json")
+		if b, err := os.ReadFile(old); err == nil {
+			json.Unmarshal(b, c)
+		}
 	}
 	return c
 }
 
 func saveConfig(c *Config) {
+	os.MkdirAll(installDir(), 0755)
 	b, _ := json.MarshalIndent(c, "", "  ")
 	os.WriteFile(cfgPath(), b, 0600)
 }
@@ -164,14 +180,147 @@ func doExam(c *bm.Client, examName string) {
 	rt.mu.Unlock()
 }
 
-// ---------- UI ----------
+// ---------- 登录小窗 ----------
+
+// runLoginDialog 登录小窗（微信式）：确认/取消
+// 返回 (登录成功的client, 是否继续)
+func runLoginDialog() (*bm.Client, bool) {
+	var dlg *walk.Dialog
+	var le *walk.LineEdit
+	var cb *walk.ComboBox
+	var statusLb *walk.Label
+	var btnLogin *walk.PushButton
+	var acceptPB, cancelPB *walk.PushButton
+
+	model := &comboBoxModel{items: accountItems(cfg)}
+
+	dlgResult := make(chan int, 1)
+
+	dialogErr := (Dialog{
+		AssignTo:      &dlg,
+		Title:         "彬煤答题助手 - 登录",
+		MinSize:       Size{Width: 340, Height: 200},
+		MaxSize:       Size{Width: 340, Height: 200},
+		DefaultButton: &acceptPB,
+		CancelButton:  &cancelPB,
+		Layout:        VBox{Margins: Margins{Left: 20, Top: 16, Right: 20, Bottom: 14}, Spacing: 10},
+		Children: []Widget{
+			Label{Text: "彬煤答题助手", Font: Font{PointSize: 13, Bold: true}},
+			Label{AssignTo: &statusLb, Text: "输入账号登录（密码自动填充）", TextColor: walk.RGB(130, 130, 130)},
+			LineEdit{AssignTo: &le, CueBanner: "身份证账号"},
+			Composite{
+				Layout: HBox{MarginsZero: true, Spacing: 6},
+				Children: []Widget{
+					Label{Text: "历史:"},
+					ComboBox{AssignTo: &cb, Model: model, OnCurrentIndexChanged: func() {
+						if uiLock {
+							return
+						}
+						if id := idFromItem(cb.Text()); id != "" {
+							le.SetText(id)
+						}
+					}},
+				},
+			},
+			Composite{
+				Layout: HBox{MarginsZero: true, Spacing: 8},
+				Children: []Widget{
+					PushButton{AssignTo: &btnLogin, Text: "登 录", MinSize: Size{Width: 90, Height: 30},
+						OnClicked: func() {
+							acc := strings.TrimSpace(le.Text())
+							if acc == "" {
+								statusLb.SetText("请输入账号")
+								return
+							}
+							btnLogin.SetEnabled(false)
+							statusLb.SetText("登录中…")
+							go func() {
+								c := bm.NewClient()
+								err := c.Login(acc, bm.DefaultPassword)
+								dlg.Synchronize(func() {
+									if err != nil {
+										btnLogin.SetEnabled(true)
+										statusLb.SetText("登录失败：" + err.Error())
+										return
+									}
+									upsertAccount(acc, c.Name)
+									dlgResult <- 1
+									dlg.Accept()
+								})
+								if err == nil {
+									rt.mu.Lock()
+									rt.client = c
+									rt.mu.Unlock()
+									logf("✅ 登录成功: %s（%s）", c.Name, acc)
+								}
+							}()
+						}},
+					PushButton{AssignTo: &acceptPB, Text: "", Visible: false},
+					PushButton{AssignTo: &cancelPB, Text: "取 消", MinSize: Size{Width: 90, Height: 30},
+						OnClicked: func() { dlgResult <- 0; dlg.Cancel() }},
+				},
+			},
+		},
+	}).Create(mw)
+	if dialogErr != nil {
+		return nil, false
+	}
+	// 已有历史账号则预填
+	if cfg.Last != "" {
+		le.SetText(cfg.Last)
+	}
+	dlg.Run()
+	r := <-dlgResult
+	if r == 1 {
+		return rtClient(), true
+	}
+	return nil, false
+}
+
+func rtClient() *bm.Client {
+	rt.mu.Lock()
+	defer rt.mu.Unlock()
+	return rt.client
+}
+
+func accountItems(c *Config) []string {
+	items := []string{}
+	for _, a := range c.Accounts {
+		items = append(items, a.Name+"（"+a.ID+"）")
+	}
+	return items
+}
+
+func idFromItem(txt string) string {
+	i := strings.LastIndex(txt, "（")
+	j := strings.LastIndex(txt, "）")
+	if i < 0 || j <= i {
+		return ""
+	}
+	return txt[i+len("（") : j]
+}
+
+func upsertAccount(id, name string) {
+	found := false
+	for i := range cfg.Accounts {
+		if cfg.Accounts[i].ID == id {
+			cfg.Accounts[i].Name = name
+			found = true
+		}
+	}
+	if !found {
+		cfg.Accounts = append(cfg.Accounts, Account{ID: id, Name: name, Pwd: bm.DefaultPassword})
+	}
+	cfg.Last = id
+	saveConfig(cfg)
+}
+
+// ---------- 主窗口 ----------
 
 var (
 	mw          *walk.MainWindow
 	verLabel    *walk.Label
-	accEdit     *walk.LineEdit
-	accBox      *walk.ComboBox
-	btnLogin    *walk.PushButton
+	userLabel   *walk.Label
 	ptLabels    [6]*walk.Label
 	taskLabel   *walk.Label
 	btnToggle   *walk.PushButton
@@ -180,7 +329,6 @@ var (
 	statusLabel *walk.Label
 	pb          *walk.ProgressBar
 
-	accModel   *comboBoxModel
 	uiLock     bool
 	appQuiting bool
 )
@@ -189,7 +337,6 @@ func pointNames() []string {
 	return []string{"签到", "知识学习", "手机考试", "模拟考试", "手机练习", "视频学习"}
 }
 
-// comboBoxModel 账号下拉数据源
 type comboBoxModel struct {
 	walk.ListModelBase
 	items []string
@@ -198,51 +345,22 @@ type comboBoxModel struct {
 func (m *comboBoxModel) ItemCount() int          { return len(m.items) }
 func (m *comboBoxModel) Value(i int) interface{} { return m.items[i] }
 
-func refreshAccModel() {
-	items := []string{}
-	cur := ""
-	for _, a := range cfg.Accounts {
-		items = append(items, a.Name+"（"+a.ID+"）")
-		if a.ID == cfg.Last {
-			cur = a.Name + "（" + a.ID + "）"
-		}
-	}
-	uiLock = true
-	accModel = &comboBoxModel{items: items}
-	accBox.SetModel(accModel)
-	accBox.SetText(cur)
-	uiLock = false
-}
-
-func buildUI() {
-	accModel = &comboBoxModel{}
-	err := (MainWindow{
+func buildMainWindow() error {
+	return (MainWindow{
 		AssignTo: &mw,
 		Title:    "彬煤答题助手",
-		MinSize:  Size{Width: 470, Height: 640},
-		MaxSize:  Size{Width: 470, Height: 640},
+		MinSize:  Size{Width: 470, Height: 620},
+		MaxSize:  Size{Width: 470, Height: 620},
+		Icon:     "2", // 从 exe 资源取（manifest 同包 syso 无图标时回退系统默认）
 		Layout:   VBox{Margins: Margins{Left: 12, Top: 10, Right: 12, Bottom: 10}, Spacing: 8},
 		Children: []Widget{
 			Composite{
 				Layout: HBox{MarginsZero: true},
 				Children: []Widget{
-					Label{AssignTo: &verLabel, Text: "彬煤答题助手  v" + AppVersion + "  ·  电脑端",
-						Font: Font{PointSize: 11, Bold: true}},
-				},
-			},
-			GroupBox{
-				Title:  "账号",
-				Layout: VBox{MarginsZero: true, Spacing: 6},
-				Children: []Widget{
-					Composite{
-						Layout: HBox{MarginsZero: true, Spacing: 6},
-						Children: []Widget{
-							LineEdit{AssignTo: &accEdit, CueBanner: "输入身份证账号"},
-							PushButton{AssignTo: &btnLogin, Text: "登录", OnClicked: onLoginClicked},
-						},
-					},
-					ComboBox{AssignTo: &accBox, Model: accModel,
-					OnCurrentIndexChanged: onAccountSwitch},
+					Label{AssignTo: &verLabel, Text: "彬煤答题助手 v" + AppVersion,
+						Font: Font{PointSize: 12, Bold: true}},
+					HSpacer{},
+					Label{AssignTo: &userLabel, Text: "", TextColor: walk.RGB(7, 193, 96)},
 				},
 			},
 			GroupBox{
@@ -261,7 +379,7 @@ func buildUI() {
 				Title:  "自动答题（不足24分自动补足·选试卷二）",
 				Layout: HBox{MarginsZero: true, Spacing: 8},
 				Children: []Widget{
-					Label{AssignTo: &taskLabel, Text: "⚪ 未登录"},
+					Label{AssignTo: &taskLabel, Text: "⚪ 待启动"},
 					PushButton{AssignTo: &btnToggle, Text: "启动", OnClicked: onToggleClicked},
 				},
 			},
@@ -276,114 +394,121 @@ func buildUI() {
 				Layout: HBox{MarginsZero: true, Spacing: 8},
 				Children: []Widget{
 					PushButton{AssignTo: &btnUpdate, Text: "检查更新", OnClicked: onCheckUpdateClicked},
-					PushButton{Text: "官网", OnClicked: func() {
-						exec.Command("rundll32", "url.dll,FileProtocolHandler", OfficialSite).Start()
-					}},
+					PushButton{Text: "官网", OnClicked: func() { openURL(OfficialSite) }},
+					PushButton{Text: "账号管理", OnClicked: onAccountManager},
 					ProgressBar{AssignTo: &pb, MinValue: 0, MaxValue: 100, Visible: false},
 					Label{AssignTo: &statusLabel, Text: ""},
 				},
 			},
 		},
 	}).Create()
-	if err != nil {
-		panic(err)
-	}
-
-	// 初始账号下拉
-	if len(cfg.Accounts) > 0 {
-		refreshAccModel()
-	}
-
-	mw.Closing().Attach(func(canceled *bool, reason walk.CloseReason) {
-		rt.mu.Lock()
-		if rt.running && rt.stopCh != nil {
-			close(rt.stopCh)
-		}
-		rt.mu.Unlock()
-	})
 }
 
-// ---------- UI 事件 ----------
+// ---------- 账号管理小窗（查看/切换/删除） ----------
 
-func setStatus(s string) {
-	mw.Synchronize(func() { statusLabel.SetText(s) })
-}
+func onAccountManager() {
+	var dlg *walk.Dialog
+	var list *walk.ListBox
+	var okPB, cancelPB *walk.PushButton
 
-func onLoginClicked() {
-	acc := strings.TrimSpace(accEdit.Text())
-	if acc == "" {
-		walk.MsgBox(mw, "提示", "请输入账号", walk.MsgBoxIconWarning)
-		return
+	type row struct {
+		name string
+		id   string
 	}
-	mw.Synchronize(func() { btnLogin.SetEnabled(false) })
-	setStatus("登录中…")
-	go func() {
-		c := bm.NewClient()
-		if err := c.Login(acc, bm.DefaultPassword); err != nil {
-			mw.Synchronize(func() {
-				btnLogin.SetEnabled(true)
-				statusLabel.SetText("登录失败")
-			})
-			logf("❌ 登录失败: %v", err)
-			return
-		}
-		found := false
-		for i := range cfg.Accounts {
-			if cfg.Accounts[i].ID == acc {
-				cfg.Accounts[i].Name = c.Name
-				found = true
-			}
-		}
-		if !found {
-			cfg.Accounts = append(cfg.Accounts, Account{ID: acc, Name: c.Name, Pwd: bm.DefaultPassword})
-		}
-		cfg.Last = acc
-		saveConfig(cfg)
-		rt.mu.Lock()
-		rt.client = c
-		rt.mu.Unlock()
-		logf("✅ 登录成功: %s（%s）", c.Name, acc)
-		mw.Synchronize(func() {
-			btnLogin.SetEnabled(true)
-			accEdit.SetText("")
-			refreshAccModel()
-			statusLabel.SetText("登录成功")
-		})
-	}()
-}
-
-func onAccountSwitch() {
-	if uiLock {
-		return
-	}
-	txt := accBox.Text()
-	i := strings.LastIndex(txt, "（")
-	j := strings.LastIndex(txt, "）")
-	if i < 0 || j <= i {
-		return
-	}
-	id := txt[i+len("（") : j]
+	rows := []acctRow{}
 	for _, a := range cfg.Accounts {
-		if a.ID == id {
+		rows = append(rows, acctRow{a.Name + "（" + a.ID + "）", a.ID})
+	}
+	lm := &listModel{rows: rows}
+
+	err := (Dialog{
+		AssignTo:     &dlg,
+		Title:        "账号管理",
+		MinSize:      Size{Width: 320, Height: 260},
+		MaxSize:      Size{Width: 320, Height: 260},
+		CancelButton: &cancelPB,
+		DefaultButton: &okPB,
+		Layout:       VBox{Margins: Margins{Left: 16, Top: 14, Right: 16, Bottom: 12}, Spacing: 10},
+		Children: []Widget{
+			Label{Text: "已保存的账号（本机）", TextColor: walk.RGB(130, 130, 130)},
+			ListBox{AssignTo: &list, Model: lm},
+			Composite{
+				Layout: HBox{MarginsZero: true, Spacing: 8},
+				Children: []Widget{
+					PushButton{Text: "删除选中", OnClicked: func() {
+						i := list.CurrentIndex()
+						if i < 0 || i >= len(rows) {
+							return
+						}
+						removed := rows[i].id
+						newAccs := []Account{}
+						for _, a := range cfg.Accounts {
+							if a.ID != removed {
+								newAccs = append(newAccs, a)
+							}
+						}
+						cfg.Accounts = newAccs
+						if cfg.Last == removed {
+							cfg.Last = ""
+							if len(cfg.Accounts) > 0 {
+								cfg.Last = cfg.Accounts[0].ID
+							}
+						}
+						saveConfig(cfg)
+						rows = append(rows[:i], rows[i+1:]...)
+					lm.rows = rows
+					list.SetModel(&listModel{rows: rows})
+						logf("🗑 已删除账号记录: %s", removed)
+					}},
+					HSpacer{},
+					PushButton{AssignTo: &okPB, Text: "关 闭", OnClicked: func() { dlg.Accept() }},
+					PushButton{AssignTo: &cancelPB, Text: "", Visible: false},
+				},
+			},
+		},
+	}).Create(mw)
+	if err != nil {
+		return
+	}
+	dlg.Run()
+	// 切换到当前 Last 账号
+	switchToLast()
+}
+
+type acctRow struct{ name, id string }
+
+type listModel struct {
+	walk.ListModelBase
+	rows []acctRow
+}
+
+func (m *listModel) ItemCount() int          { return len(m.rows) }
+func (m *listModel) Value(i int) interface{} { return m.rows[i].name }
+
+func switchToLast() {
+	if cfg.Last == "" {
+		return
+	}
+	for _, a := range cfg.Accounts {
+		if a.ID == cfg.Last {
 			go func(acc Account) {
-				setStatus("切换账号中…")
 				c := bm.NewClient()
-				if err := c.Login(acc.ID, acc.Pwd); err != nil {
-					logf("❌ 切换失败: %v", err)
-					setStatus("切换失败")
-					return
+				if err := c.Login(acc.ID, acc.Pwd); err == nil {
+					rt.mu.Lock()
+					rt.client = c
+					rt.mu.Unlock()
+					logf("🔄 已切换: %s（%s）", c.Name, acc.ID)
 				}
-				cfg.Last = acc.ID
-				saveConfig(cfg)
-				rt.mu.Lock()
-				rt.client = c
-				rt.mu.Unlock()
-				logf("🔄 切换账号: %s（%s）", c.Name, acc.ID)
-				setStatus("已切换")
 			}(a)
 			return
 		}
 	}
+}
+
+// ---------- 主窗口事件 ----------
+
+func setStatus(s string) {
+	mw.Synchronize(func() { statusLabel.SetText(s) })
 }
 
 func onToggleClicked() {
@@ -415,18 +540,6 @@ func onToggleClicked() {
 	}
 }
 
-// ---------- 更新 ----------
-
-func silentCheckUpdate() {
-	meta, err := fetchUpdateMeta()
-	if err != nil || meta == nil {
-		return
-	}
-	if meta.VersionCode > AppVersionCode {
-		setStatus("发现新版本 v" + meta.VersionName + "，可点「检查更新」安装")
-	}
-}
-
 func onCheckUpdateClicked() {
 	mw.Synchronize(func() { btnUpdate.SetEnabled(false) })
 	setStatus("检查更新中…")
@@ -446,6 +559,11 @@ func onCheckUpdateClicked() {
 			})
 			return
 		}
+		if !walkMsgBoxYesNo("发现更新",
+			"发现新版本 v"+meta.VersionName+"，是否下载安装？\n\n更新内容：\n"+meta.Changelog) {
+			mw.Synchronize(func() { btnUpdate.SetEnabled(true) })
+			return
+		}
 		mw.Synchronize(func() {
 			pb.SetVisible(true)
 			pb.SetValue(0)
@@ -462,17 +580,23 @@ func onCheckUpdateClicked() {
 			})
 			return
 		}
-		mw.Synchronize(func() {
-			pb.SetValue(100)
-			statusLabel.SetText("安装更新…")
-		})
-		if err := selfReplace(tmp); err != nil {
-			mw.Synchronize(func() {
-				btnUpdate.SetEnabled(true)
-				pb.SetVisible(false)
-				statusLabel.SetText("更新失败: " + err.Error())
-			})
+		// 已安装场景：静默自替换；未安装（便携）场景：提示安装
+		if isInstalled() {
+			mw.Synchronize(func() { statusLabel.SetText("安装更新…") })
+			if err := selfReplace(tmp); err != nil {
+				mw.Synchronize(func() {
+					btnUpdate.SetEnabled(true)
+					pb.SetVisible(false)
+					statusLabel.SetText("更新失败: " + err.Error())
+				})
+			}
+			return
 		}
+		mw.Synchronize(func() {
+			btnUpdate.SetEnabled(true)
+			pb.SetVisible(false)
+			statusLabel.SetText("已下载，重启后生效")
+		})
 	}()
 }
 
@@ -507,6 +631,10 @@ func updateUI() {
 			ptLabels[i].SetText(name + "  -")
 			ptLabels[i].SetTextColor(walk.RGB(120, 120, 120))
 		}
+	}
+
+	if c := client; c != nil {
+		userLabel.SetText("👤 " + c.Name)
 	}
 
 	if running {
