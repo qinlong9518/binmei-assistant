@@ -20,13 +20,13 @@ jobs:
         with:
           go-version: "1.22"
 
-      - name: Build (rsrc: icon+manifest; goversioninfo: version block)
+      - name: Build with icon and manifest
         run: |
           go run github.com/akavel/rsrc@v0.10.2 -ico cmd/bmwin/app.ico -manifest cmd/bmwin/app.manifest -arch amd64 -o cmd/bmwin/rsrc_windows_amd64.syso
           go run github.com/josephspurrier/goversioninfo/cmd/goversioninfo@v1.4.0 -platform-specific -o cmd/bmwin/rsrc_version_windows_amd64.syso cmd/bmwin/versioninfo.json
           go build -v -trimpath -ldflags "-s -w -H windowsgui" -o binmei-desktop.exe ./cmd/bmwin
 
-      - name: Smoke test (window + version info)
+      - name: Smoke test
         shell: pwsh
         run: |
           $p = Start-Process -FilePath ".\binmei-desktop.exe" -PassThru
@@ -42,17 +42,17 @@ jobs:
           } else {
             Write-Host "WINDOW OK - 进程存活 PID=$($p.Id)"
             $v = (Get-Item ".\binmei-desktop.exe").VersionInfo
-            Write-Host "ProductName=$($v.ProductName) FileVersion=$($v.FileVersion) Icon Embedded=Yes"
+            Write-Host "ProductName=$($v.ProductName) FileVersion=$($v.FileVersion)"
             if (Test-Path "$env:LOCALAPPDATA\Programs\BinmeiAssistant\BinmeiAssistant.exe") {
               Write-Host "INSTALLED_OK"
             } else {
-              Write-Host "PORTABLE_MODE（安装询问窗等待中，属正常）"
+              Write-Host "PORTABLE_MODE_OK（安装询问窗等待中，属正常）"
             }
             Stop-Process -Id $p.Id -Force
           }
           if (Test-Path bm_debug.log) { Write-Host "调试日志:"; Get-Content bm_debug.log }
 
-      - name: Upload exe artifact
+      - name: Upload exe
         uses: actions/upload-artifact@v4
         with:
           name: binmei-desktop
