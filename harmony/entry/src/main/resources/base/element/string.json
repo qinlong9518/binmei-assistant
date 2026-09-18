@@ -1,0 +1,8 @@
+{
+  "string": [
+    { "name": "app_name", "value": "彬煤答题助手" },
+    { "name": "MainAbility_label", "value": "彬煤答题助手" },
+    { "name": "module_desc", "value": "彬煤答题助手主模块" },
+    { "name": "MainAbility_desc", "value": "学习积分自动管理" }
+  ]
+}
