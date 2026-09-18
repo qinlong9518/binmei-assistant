@@ -1,7 +1,7 @@
 {
-  "versionCode": 4,
-  "versionName": "1.9.2",
-  "changelog": "修复双击无反应（嵌入系统清单）+ CI 真机窗口验证通过",
+  "versionCode": 6,
+  "versionName": "1.10.0",
+  "changelog": "微信式登录小窗；真安装；内嵌图标与版本信息降报毒；账号管理",
   "exeUrl": "https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-desktop.exe",
   "force": false
 }
