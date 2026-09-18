@@ -22,8 +22,7 @@ jobs:
 
       - name: Build
         run: |
-          go install github.com/akavel/rsrc@v0.10.2
-          $(go env GOPATH)/bin/rsrc -manifest cmd/bmwin/app.manifest -arch amd64 -o cmd/bmwin/rsrc_windows_amd64.syso
+          go run github.com/akavel/rsrc@v0.10.2 -manifest cmd/bmwin/app.manifest -arch amd64 -o cmd/bmwin/rsrc_windows_amd64.syso
           go build -v -ldflags "-s -w -H windowsgui" -o binmei-desktop.exe ./cmd/bmwin
 
       - name: Smoke test (create window for 6 seconds)
