@@ -5,204 +5,228 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>彬煤答题助手 - 官方下载</title>
 <style>
-:root { --g:#07C160; --gd:#06AD56; --bg:#F7F7F7; --text:#1A1A1A; --muted:#888; --line:#E7E7E7; }
-* { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-body { font-family:-apple-system,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
-a { text-decoration:none; color:inherit; }
-.wrap { max-width:1080px; margin:0 auto; padding:0 24px; }
+*{margin:0;padding:0}
+body{font-family:-apple-system-font,BlinkMacSystemFont,"Helvetica Neue","PingFang SC","Hiragino Sans GB","Microsoft YaHei UI","Microsoft YaHei",Arial,sans-serif;color:rgba(0,0,0,.9);line-height:1.4;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+ul{list-style:none}
 
-/* 顶部导航（毛玻璃粘性） */
-.nav { position:sticky; top:0; z-index:100; background:rgba(255,255,255,.9); backdrop-filter:saturate(180%) blur(16px); border-bottom:1px solid var(--line); }
-.nav-inner { max-width:1080px; margin:0 auto; padding:0 24px; height:60px; display:flex; align-items:center; gap:12px; }
-.logo { width:32px; height:32px; border-radius:8px; background:linear-gradient(135deg,var(--g),#05a350); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:17px; }
-.brand { font-size:16px; font-weight:600; }
-.nav-links { display:flex; gap:28px; margin-left:auto; font-size:14px; color:#555; align-items:center; }
-.nav-links a { transition:color .2s; white-space:nowrap; }
-.nav-links a:hover { color:var(--g); }
-.nav-cta { background:var(--g); color:#fff !important; padding:7px 18px; border-radius:6px; font-weight:500; }
-.nav-cta:hover { background:var(--gd); color:#fff !important; }
-@media (max-width:640px) { .nav-links a:not(.nav-cta) { display:none; } .nav-inner { height:54px; } }
+/* ===== 顶部导航（绿色横条，微信式） ===== */
+.head{align-items:center;background-color:#2aae67;box-sizing:border-box;display:flex;padding:0 32px;position:fixed;top:0;width:100%;height:54px;z-index:100}
+.logo{align-items:center;display:flex;gap:10px;color:#fff;font-size:17px;font-weight:600}
+.logo svg{width:28px;height:28px}
+.head-links{margin-left:auto;display:flex;gap:22px;align-items:center}
+.head-links a{color:hsla(0,0%,100%,.9);font-size:14px}
+.head-links a:hover{color:#fff}
 
-/* Hero */
-.hero { text-align:center; padding:76px 24px 66px; background:linear-gradient(180deg,#E8F8EE 0%, var(--bg) 100%); }
-.hero .badge { display:inline-block; padding:5px 14px; background:#fff; border:1px solid #C9EED8; border-radius:20px; color:var(--g); font-size:13px; margin-bottom:22px; }
-.hero h1 { font-size:44px; font-weight:700; letter-spacing:1px; }
-.hero .sub { font-size:18px; color:var(--muted); margin:16px auto 6px; font-weight:300; max-width:620px; }
-.hero .platforms { margin-top:14px; font-size:13.5px; color:var(--muted); }
-.hero .platforms b { color:var(--text); }
-@media (max-width:640px) { .hero h1 { font-size:31px; } .hero { padding:52px 20px 46px; } }
+/* ===== Banner（绿色大区块 + 底部圆弧） ===== */
+.banner{color:hsla(0,0%,100%,.9);overflow:hidden;padding:152px 0 112px;position:relative}
+.banner__inner{background-color:#2aae67;border-radius:0 0 50% 50%;bottom:0;content:"";display:block;height:100%;left:50%;min-width:1440px;overflow:hidden;position:absolute;transform:translateX(-50%);width:150%;z-index:-1}
+.banner__bd{align-items:center;animation:show 1.3s both;display:flex;flex-direction:column;position:relative;z-index:1}
+.banner__logo{height:56px;width:180px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;letter-spacing:2px;color:#fff}
 
-/* 区块标题 */
-.section { padding:58px 0 12px; }
-.sec-title { text-align:center; font-size:26px; font-weight:700; }
-.sec-sub { text-align:center; color:var(--muted); font-size:14px; margin:8px 0 34px; }
+/* 更新日志 */
+.banner__update-log{padding:24px 0 0;position:relative;width:500px}
+.banner__update-log:before{border-top:1px solid hsla(0,0%,100%,.3);content:"";display:block;left:0;position:absolute;top:0;transform:scaleY(.5);transform-origin:left top;width:100%}
+.banner__update-log li{display:flex;margin-bottom:10px}
+.banner__update-log li:last-child{margin-bottom:0}
+.banner__update-log a{color:hsla(0,0%,100%,.9);font-size:15px;cursor:default}
+.banner__update-content{align-items:center;display:flex;flex:1;line-height:1.4;overflow:hidden}
+.banner__updata-time{color:hsla(0,0%,100%,.7);font-variant-numeric:tabular-nums;margin-left:16px;font-size:14px}
+.banner__update-more{color:hsla(0,0%,100%,.9);display:inline-block;margin-top:16px;font-size:14px}
+.banner__update-more:after{content:">";display:inline-block;margin-left:5px}
 
-/* 下载卡片（三端） */
-.dl-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; padding-bottom:26px; }
-@media (max-width:860px) { .dl-grid { grid-template-columns:1fr; } }
-.dl-card { background:#fff; border:1px solid var(--line); border-radius:16px; overflow:hidden; transition:.25s; }
-.dl-card:hover { box-shadow:0 12px 40px rgba(0,0,0,.08); transform:translateY(-3px); }
-.dl-card .head { padding:22px 24px 16px; border-bottom:1px solid #F2F2F2; display:flex; gap:14px; align-items:center; }
-.plat-ico { width:50px; height:50px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:25px; color:#fff; flex:none; }
-.ico-pc { background:linear-gradient(135deg,#5B8DEF,#3A6FD8); }
-.ico-android { background:linear-gradient(135deg,var(--g),#05a350); }
-.ico-harmony { background:linear-gradient(135deg,#111,var(--g)); }
-.dl-card .head h3 { font-size:17px; }
-.dl-card .head p { font-size:12.5px; color:var(--muted); }
-.dl-card .body { padding:20px 24px 24px; }
-.dl-card .meta { font-size:13px; color:var(--muted); margin-bottom:16px; }
-.dl-card .meta b { color:var(--text); }
-.dl-btn { display:block; text-align:center; padding:12px 0; border-radius:8px; font-size:15px; font-weight:500; background:var(--g); color:#fff; transition:.2s; margin-bottom:10px; }
-.dl-btn:hover { background:var(--gd); }
-.dl-mirror { display:block; text-align:center; font-size:13px; color:var(--g); padding:2px 0 8px; }
-.dl-note { font-size:12px; color:var(--muted); text-align:center; }
+/* 圆形平台下载按钮（7 宫格） */
+.banner__download{align-items:center;column-gap:32px;display:grid;grid-template-columns:repeat(7,1fr);margin-top:72px}
+.banner__download-item{align-items:center;background-color:hsla(0,0%,100%,.07);border-radius:50%;color:hsla(0,0%,100%,.9);cursor:pointer;display:flex;flex-direction:column;font-size:14px;height:120px;width:120px;justify-content:center;transition:background-color .5s}
+.banner__download-item i{margin-bottom:6px;display:block}
+.banner__download-item i svg{width:40px;height:40px}
+.banner__download-item span{line-height:1.4;margin:0 10px;text-align:center}
+.banner__download-item:hover{background-color:hsla(0,0%,100%,.18)}
+@media (max-width:1024px){.banner__download{grid-template-columns:repeat(4,1fr);row-gap:24px}.banner__download-item{font-size:13px;height:112px;width:112px}}
+@media (max-width:560px){.banner{padding:120px 0 90px}.banner__download{grid-template-columns:repeat(3,1fr);column-gap:12px;margin-top:48px}.banner__update-log{width:88%}}
 
-/* 功能 */
-.feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; padding-bottom:20px; }
-@media (max-width:860px) { .feat-grid { grid-template-columns:1fr 1fr; } }
-@media (max-width:560px) { .feat-grid { grid-template-columns:1fr; } }
-.feat { background:#fff; border:1px solid var(--line); border-radius:14px; padding:22px; transition:.2s; }
-.feat:hover { box-shadow:0 8px 28px rgba(0,0,0,.06); }
-.feat .ico { font-size:26px; }
-.feat h4 { font-size:15.5px; margin:10px 0 6px; }
-.feat p { font-size:13.5px; color:var(--muted); }
+/* 向下箭头动画 */
+.banner__arrow{animation:arrow 1s 1s infinite;background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23FFF' opacity='.2'/%3E%3Cpath fill='%23FFF' d='M11.3 15.7a1 1 0 0 0 1.4 0l4-4a1 1 0 0 0-1.4-1.4l-3.3 3.29-3.3-3.3a1 1 0 1 0-1.4 1.42l4 4z'/%3E%3C/g%3E%3C/svg%3E");background-size:cover;display:block;height:24px;left:50%;margin-left:-12px;margin-top:56px;position:absolute;width:24px;bottom:24px}
+@keyframes arrow{0%{transform:translateY(0)}50%{transform:translateY(8px)}100%{transform:translateY(0)}}
+@keyframes show{0%{opacity:0;transform:translateY(30px)}100%{opacity:1;transform:none}}
 
-/* 安装指引 */
-.guide { display:grid; grid-template-columns:1fr 1fr; gap:26px; padding-bottom:30px; }
-@media (max-width:720px) { .guide { grid-template-columns:1fr; } }
-.guide-col { background:#fff; border:1px solid var(--line); border-radius:16px; padding:26px 28px; }
-.guide-col h3 { font-size:16px; margin-bottom:18px; }
-.guide-col ol { list-style:none; counter-reset:n; }
-.guide-col li { counter-increment:n; position:relative; padding:0 0 16px 40px; font-size:14px; color:#444; }
-.guide-col li::before { content:counter(n); position:absolute; left:0; top:0; width:26px; height:26px; border-radius:50%; background:var(--g); color:#fff; font-size:13px; display:flex; align-items:center; justify-content:center; font-weight:600; }
-.guide-col li::after { content:''; position:absolute; left:13px; top:28px; bottom:2px; width:1px; background:var(--line); }
-.guide-col li:last-child::after { display:none; }
+/* ===== 下方白色区域：下载卡片 ===== */
+.section{padding:72px 24px 10px;max-width:1160px;margin:0 auto}
+.section h2{text-align:center;font-size:32px;font-weight:400;margin-bottom:10px}
+.section .sub{text-align:center;color:rgba(0,0,0,.45);font-size:15px;margin-bottom:44px}
+.dl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+@media (max-width:860px){.dl-grid{grid-template-columns:1fr}}
+.dl-card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden;transition:box-shadow .3s}
+.dl-card:hover{box-shadow:0 10px 34px rgba(0,0,0,.12)}
+.dl-card .hd{padding:26px 28px 18px;display:flex;align-items:center;gap:16px}
+.dl-card .hd .ico{width:52px;height:52px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center}
+.dl-card .hd .ico svg{width:28px;height:28px}
+.ico-green{background:#2aae67}
+.ico-blue{background:#1485EE}
+.ico-dark{background:#111}
+.dl-card .hd h3{font-size:19px;font-weight:500}
+.dl-card .hd p{font-size:13px;color:rgba(0,0,0,.45);margin-top:3px}
+.dl-card .bd{padding:0 28px 28px}
+.dl-card .ver{font-size:14px;color:rgba(0,0,0,.5);margin-bottom:20px}
+.dl-card .ver b{color:#2aae67}
+.dl-btn{display:flex;align-items:center;justify-content:center;height:54px;background:#07c160;border-radius:4px;font-size:15px;color:#fff;transition:.2s;margin-bottom:12px}
+.dl-btn:hover{background:#06b259}
+.dl-btn svg{width:22px;height:22px;margin-right:10px}
+.dl-mirror{display:block;text-align:center;font-size:13px;color:#576b95;padding:2px 0 6px}
+.dl-mirror:hover{color:#3a5285}
+.dl-note{text-align:center;font-size:12px;color:rgba(0,0,0,.35)}
 
-/* 页脚 */
-footer { border-top:1px solid var(--line); padding:30px 0 40px; text-align:center; color:var(--muted); font-size:13px; }
-footer .links { margin-bottom:10px; }
-footer .links a { color:var(--g); margin:0 10px; }
+/* 更新日志区块 */
+.updates{max-width:680px;margin:64px auto 0;padding:0 24px 80px}
+.updates h2{text-align:center;font-size:26px;font-weight:400;margin-bottom:30px}
+.updates ul{border-top:1px solid rgba(0,0,0,.08)}
+.updates li{display:flex;align-items:center;padding:14px 4px;border-bottom:1px solid rgba(0,0,0,.06);font-size:15px}
+.updates li .t{flex:1;color:rgba(0,0,0,.75)}
+.updates li .d{color:rgba(0,0,0,.4);font-variant-numeric:tabular-nums}
+
+footer{background:#2aae67;color:hsla(0,0%,100%,.9);text-align:center;padding:34px 24px;font-size:13px}
+footer a{color:hsla(0,0%,100%,.9);margin:0 12px}
+footer .cp{margin-top:10px;color:hsla(0,0%,100%,.6)}
 </style>
 </head>
 <body>
 
-<nav class="nav"><div class="nav-inner">
-  <div class="logo">彬</div>
-  <div class="brand">彬煤答题助手</div>
-  <div class="nav-links">
-    <a href="#download">下载</a>
-    <a href="#features">功能</a>
-    <a href="#guide">安装指引</a>
-    <a class="nav-cta" href="#download">立即下载</a>
+<!-- 顶部绿色横条 -->
+<header class="head">
+  <div class="logo">
+    <svg viewBox="0 0 40 40"><g fill="#FFF"><circle cx="20" cy="20" r="17" fill="none" stroke="#FFF" stroke-width="2.5"/><path d="M12 20.5l5.5 5.5L28 15.5" fill="none" stroke="#FFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g></svg>
+    彬煤答题助手
   </div>
-</div></nav>
-
-<header class="hero">
-  <div class="badge">⚡ 全平台 · Windows / Android / HarmonyOS</div>
-  <h1>学习积分，自动搞定</h1>
-  <p class="sub">一部手机或一台电脑，考试自动作答、积分自动补足，全天无人值守。</p>
-  <p class="platforms"><b>Windows 客户端</b> · <b>Android App</b> · <b>HarmonyOS 原生应用</b></p>
+  <div class="head-links">
+    <a href="#download">下载</a>
+    <a href="#updates">更新日志</a>
+    <a href="https://github.com/qinlong9518/binmei-assistant" target="_blank">GitHub</a>
+  </div>
 </header>
 
-<section class="section wrap" id="download">
-  <h2 class="sec-title">下载</h2>
-  <p class="sec-sub">选择你的平台，获取最新版本</p>
+<!-- 绿色 Banner（微信式：圆弧底 + 更新日志 + 圆形平台按钮） -->
+<div class="banner">
+  <div class="banner__inner"></div>
+  <div class="banner__bd">
+    <div class="banner__logo">彬煤答题助手</div>
+
+    <div class="banner__update-log">
+      <ul>
+        <li><a class="banner__update-content">彬煤答题助手 1.11.0 for Windows 全新发布</a><span class="banner__updata-time">09-18</span></li>
+        <li><a class="banner__update-content">HarmonyOS 原生应用开放源码</a><span class="banner__updata-time">09-18</span></li>
+        <li><a class="banner__update-content">微信 8.0.78 同款界面主题全面上线</a><span class="banner__updata-time">09-18</span></li>
+      </ul>
+      <a class="banner__update-more" href="#updates">更多日志</a>
+    </div>
+
+    <div class="banner__download">
+      <!-- Windows -->
+      <a class="banner__download-item" href="https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-desktop.exe" title="下载 Windows 版">
+        <i><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><g fill="#FFF" fill-rule="evenodd"><path d="M6.316 21.826v9.025l10.99 1.539V21.826zm12.045 0v10.712l14.463 2.026V21.826zM6.316 11.767v9.004h10.99V10.205zM32.824 8l-14.463 2.055v10.716h14.463z" opacity="1"/><path fill="none" d="M0 0h40v40H0z"/></g></svg></i>
+        <span>Windows</span>
+      </a>
+      <!-- Android -->
+      <a class="banner__download-item" href="https://github.com/qinlong9518/binmei-assistant/releases/latest/download/app-release.apk" title="下载 Android 版">
+        <i><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><g fill="none" fill-rule="evenodd"><path d="M0 0h40v40H0z"/><g opacity="1" transform="translate(3.158 11.158)"><path fill="#FFF" d="M24.594 14.156a1.402 1.402 0 1 1-.003-2.803 1.402 1.402 0 0 1 .003 2.803m-15.504 0a1.402 1.402 0 1 1-.002-2.803 1.402 1.402 0 0 1 .002 2.803M25.097 5.72L27.9.874a.584.584 0 0 0-1.01-.583L24.05 5.2c-2.17-.989-4.608-1.54-7.21-1.54-2.6 0-5.038.552-7.209 1.54L6.794.291a.584.584 0 0 0-1.01.582l2.803 4.848C3.774 8.335.482 13.2 0 18.947h33.684C33.202 13.2 29.91 8.335 25.097 5.721"/></g></g></svg></i>
+        <span>Android</span>
+      </a>
+      <!-- HarmonyOS -->
+      <a class="banner__download-item" href="https://github.com/qinlong9518/binmei-assistant/tree/main/harmony" title="获取 HarmonyOS 源码">
+        <i><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><g fill="#FFF" fill-rule="evenodd"><path fill-rule="nonzero" d="M0 0h40v40H0z" opacity="0"/><path d="M15.2 23.2c-.4-.2-.8-.3-1.3-.3s-.9.1-1.3.3c-.4.2-.7.5-.9.9-.2.4-.3.8-.3 1.3s.1.9.3 1.3c.2.4.5.7.9.9.4.2.8.3 1.3.3s.9-.1 1.3-.3c.4-.2.7-.5.9-.9.2-.4.3-.8.3-1.3s-.1-.9-.3-1.3c-.2-.4-.5-.7-.9-.9zM11.6 5C8 5 5 7.9 5 11.6v16.8C5 32 7.9 35 11.6 35h16.8c3.6 0 6.6-2.9 6.6-6.6V11.6C35 8 32.1 5 28.4 5H11.6zm-.9 5.3h1.5v3.2h3.5v-3.2h1.5v8h-1.5v-3.4h-3.5v3.4h-1.5v-8zm6.1 22h-5.7V31h5.7v1.3zm.7-4.8c-.4.6-.9 1.1-1.5 1.5-.6.4-1.3.5-2.1.5s-1.5-.2-2.1-.5c-.6-.4-1.1-.9-1.5-1.5-.4-.6-.5-1.3-.5-2.1s.2-1.5.5-2.1c.4-.6.9-1.1 1.5-1.5.6-.4 1.3-.5 2.1-.5s1.5.2 2.1.5c.6.4 1.1.9 1.5 1.5.4.6.5 1.3.5 2.1s-.2 1.5-.5 2.1zm10.6 1.1c-.2.4-.6.6-1 .8-.4.2-.9.3-1.4.3-.5 0-1.3-.1-1.9-.4-.5-.3-.9-.6-1.1-1.1V28h.1l.7-.4.2-.1.2.3.6.6c.3.3.7.4 1.1.4.5 0 .9-.1 1.2-.4.3-.2.5-.6.5-1 0-.3-.1-.6-.3-.8-.2-.2-.5-.4-.9-.5l-1.1-.3c-1-.3-1.7-.7-2.2-1.2-.5-.5-.7-1.1-.7-1.9 0-.9.4-1.7 1.1-2.3.7-.6 1.6-.9 2.7-.9 1.1 0 2 .3 2.7.9.7.6 1.1 1.3 1.2 2.2h-2.2c-.1-.4-.3-.8-.6-1-.3-.2-.7-.3-1.1-.3-.4 0-.8.1-1.1.3-.3.2-.4.5-.4.9 0 .3.1.5.3.7.2.2.5.4.9.5l1.2.3c1 .3 1.8.7 2.3 1.2.5.5.8 1.2.8 2 0 1-.4 1.8-1.1 2.4z"/></g></svg></i>
+        <span>HarmonyOS</span>
+      </a>
+      <!-- 更新日志（圆形入口） -->
+      <a class="banner__download-item" href="#updates" title="更新日志">
+        <i><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><g fill="#FFF"><path d="M11 8h18a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H18l-5 4v-4h-2a3 3 0 0 1-3-3V11a3 3 0 0 1 3-3zm3 6h14v2H14v-2zm0 5h14v2H14v-2zm0 5h9v2h-9v-2z"/></g></svg></i>
+        <span>更新日志</span>
+      </a>
+      <!-- GitHub（圆形入口） -->
+      <a class="banner__download-item" href="https://github.com/qinlong9518/binmei-assistant" title="GitHub 仓库">
+        <i><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 16 16"><path fill="#FFF" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></i>
+        <span>GitHub</span>
+      </a>
+    </div>
+
+    <a class="banner__arrow" href="#download" aria-label="向下"></a>
+  </div>
+</div>
+
+<!-- 白色区域：下载 -->
+<section class="section" id="download">
+  <h2>获取最新版本</h2>
+  <p class="sub">三端同源 · 数据仅存本机 · 免费使用</p>
   <div class="dl-grid">
 
-    <!-- 电脑端 -->
     <div class="dl-card">
-      <div class="head">
-        <div class="plat-ico ico-pc">💻</div>
-        <div><h3>Windows 电脑端</h3><p>独立窗口程序 · 双击即用</p></div>
+      <div class="hd">
+        <div class="ico ico-blue"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 40 40"><g fill="#FFF" fill-rule="evenodd"><path d="M6.316 21.826v9.025l10.99 1.539V21.826zm12.045 0v10.712l14.463 2.026V21.826zM6.316 11.767v9.004h10.99V10.205zM32.824 8l-14.463 2.055v10.716h14.463z"/></g></svg></div>
+        <div><h3>Windows 电脑端</h3><p>独立窗口程序 · 支持安装与便携</p></div>
       </div>
-      <div class="body">
-        <p class="meta">版本 <b>v1.11.0</b> · <b>9 MB</b> · 免安装可选</p>
-        <a class="dl-btn" href="https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-desktop.exe">⬇ 下载 exe（官方源）</a>
+      <div class="bd">
+        <p class="ver">最新版本 <b>v1.11.0</b> · 大小 9 MB · 微信绿主题</p>
+        <a class="dl-btn" href="https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-desktop.exe">
+          <svg viewBox="0 0 24 24" fill="#FFF"><path d="M12 3v10.6l3.3-3.3 1.4 1.4L12 16.4l-4.7-4.7 1.4-1.4 3.3 3.3V3h0zM5 19h14v2H5z"/></svg>
+          下载 1.11.0 (64位)
+        </a>
         <a class="dl-mirror" href="https://ghfast.top/https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-desktop.exe">国内镜像加速下载</a>
-        <p class="dl-note">首次运行可选安装（创建桌面快捷方式），内置在线更新</p>
+        <p class="dl-note">适用于 Windows 10 及以上版本</p>
       </div>
     </div>
 
-    <!-- 安卓端 -->
     <div class="dl-card">
-      <div class="head">
-        <div class="plat-ico ico-android">🤖</div>
+      <div class="hd">
+        <div class="ico ico-green"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 40 40"><g fill="none" fill-rule="evenodd"><g transform="translate(3.158 11.158)"><path fill="#FFF" d="M24.594 14.156a1.402 1.402 0 1 1-.003-2.803 1.402 1.402 0 0 1 .003 2.803m-15.504 0a1.402 1.402 0 1 1-.002-2.803 1.402 1.402 0 0 1 .002 2.803M25.097 5.72L27.9.874a.584.584 0 0 0-1.01-.583L24.05 5.2c-2.17-.989-4.608-1.54-7.21-1.54-2.6 0-5.038.552-7.209 1.54L6.794.291a.584.584 0 0 0-1.01.582l2.803 4.848C3.774 8.335.482 13.2 0 18.947h33.684C33.202 13.2 29.91 8.335 25.097 5.721"/></g></g></svg></div>
         <div><h3>Android 手机端</h3><p>含鸿蒙卓易通环境</p></div>
       </div>
-      <div class="body">
-        <p class="meta">版本 <b>v1.7.5</b> · <b>10.8 MB</b> · Android 12+</p>
-        <a class="dl-btn" href="https://github.com/qinlong9518/binmei-assistant/releases/latest/download/app-release.apk">⬇ 下载 APK（官方源）</a>
+      <div class="bd">
+        <p class="ver">最新版本 <b>v1.7.5</b> · 大小 10.8 MB · Android 12+</p>
+        <a class="dl-btn" href="https://github.com/qinlong9518/binmei-assistant/releases/latest/download/app-release.apk">
+          <svg viewBox="0 0 24 24" fill="#FFF"><path d="M12 3v10.6l3.3-3.3 1.4 1.4L12 16.4l-4.7-4.7 1.4-1.4 3.3 3.3V3h0zM5 19h14v2H5z"/></svg>
+          下载 1.7.5 APK
+        </a>
         <a class="dl-mirror" href="https://ghfast.top/https://github.com/qinlong9518/binmei-assistant/releases/latest/download/app-release.apk">国内镜像加速下载</a>
-        <p class="dl-note">手机浏览器打开本页点击下载；鸿蒙经卓易通安装</p>
+        <p class="dl-note">手机浏览器直接下载安装</p>
       </div>
     </div>
 
-    <!-- 鸿蒙端 -->
     <div class="dl-card">
-      <div class="head">
-        <div class="plat-ico ico-harmony">⚡</div>
-        <div><h3>HarmonyOS 原生</h3><p>纯 ArkTS 原生应用</p></div>
+      <div class="hd">
+        <div class="ico ico-dark"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 40 40"><g fill="#FFF" fill-rule="evenodd"><path d="M15.2 23.2c-.4-.2-.8-.3-1.3-.3s-.9.1-1.3.3c-.4.2-.7.5-.9.9-.2.4-.3.8-.3 1.3s.1.9.3 1.3c.2.4.5.7.9.9.4.2.8.3 1.3.3s.9-.1 1.3-.3c.4-.2.7-.5.9-.9.2-.4.3-.8.3-1.3s-.1-.9-.3-1.3c-.2-.4-.5-.7-.9-.9zM11.6 5C8 5 5 7.9 5 11.6v16.8C5 32 7.9 35 11.6 35h16.8c3.6 0 6.6-2.9 6.6-6.6V11.6C35 8 32.1 5 28.4 5H11.6zm-.9 5.3h1.5v3.2h3.5v-3.2h1.5v8h-1.5v-3.4h-3.5v3.4h-1.5v-8zm6.1 22h-5.7V31h5.7v1.3z"/></g></svg></div>
+        <div><h3>HarmonyOS 原生</h3><p>纯 ArkTS · ArkUI 原生界面</p></div>
       </div>
-      <div class="body">
-        <p class="meta">版本 <b>v1.0.0</b> · 源码构建 · ArkUI 原生</p>
-        <a class="dl-btn" href="https://github.com/qinlong9518/binmei-assistant/tree/main/harmony">⬇ 获取源码（GitHub）</a>
-        <a class="dl-mirror" href="https://github.com/qinlong9518/binmei-assistant/tree/main/harmony">DevEco Studio 构建</a>
-        <p class="dl-note">原生 ArkUI 无 WebView；与桌面端协议同源</p>
+      <div class="bd">
+        <p class="ver">版本 <b>v1.0.0</b> · 开放源码 · 与桌面端协议同源</p>
+        <a class="dl-btn" href="https://github.com/qinlong9518/binmei-assistant/tree/main/harmony">
+          <svg viewBox="0 0 24 24" fill="#FFF"><path d="M12 3v10.6l3.3-3.3 1.4 1.4L12 16.4l-4.7-4.7 1.4-1.4 3.3 3.3V3h0zM5 19h14v2H5z"/></svg>
+          获取源码工程
+        </a>
+        <a class="dl-mirror" href="https://developer.huawei.com/consumer/cn/deveco-studio/" target="_blank">下载 DevEco Studio 构建工具</a>
+        <p class="dl-note">DevEco Studio 打开工程 → 一键构建 HAP</p>
       </div>
     </div>
 
   </div>
 </section>
 
-<section class="section wrap" id="features">
-  <h2 class="sec-title">核心功能</h2>
-  <p class="sec-sub">三端同源，能力一致</p>
-  <div class="feat-grid">
-    <div class="feat"><div class="ico">📝</div><h4>全自动答题</h4><p>进入试卷自动作答翻题交卷，题数跟随试卷下发数量。</p></div>
-    <div class="feat"><div class="ico">🎯</div><h4>智能自动开考</h4><p>手机考试、模拟考试分别判断，不足自动选试卷二补足。</p></div>
-    <div class="feat"><div class="ico">📊</div><h4>实时积分面板</h4><p>今日积分明细常驻显示，两行三列清晰直观。</p></div>
-    <div class="feat"><div class="ico">👥</div><h4>多账号管理</h4><p>显示人名而非证件号，一键切换，记录本机可管理。</p></div>
-    <div class="feat"><div class="ico">🔄</div><h4>在线自更新</h4><p>程序内检查更新，多镜像加速，下载后自动替换重启。</p></div>
-    <div class="feat"><div class="ico">🛡</div><h4>本地运行</h4><p>不上传任何数据；账号仅保存在本机，可随时删除。</p></div>
-  </div>
-</section>
-
-<section class="section wrap" id="guide">
-  <h2 class="sec-title">安装指引</h2>
-  <p class="sec-sub">跟着步骤，一分钟上手</p>
-  <div class="guide">
-    <div class="guide-col">
-      <h3>💻 Windows 电脑端</h3>
-      <ol>
-        <li>点击「下载 exe」获取安装文件。</li>
-        <li>双击运行，提示安装时点「是」。</li>
-        <li>桌面出现「彬煤答题助手」图标，双击打开。</li>
-        <li>小窗输入账号登录（密码已内置）。</li>
-        <li>点「启动」，不足 24 分自动补足。</li>
-      </ol>
-    </div>
-    <div class="guide-col">
-      <h3>📱 Android / 鸿蒙手机端</h3>
-      <ol>
-        <li>手机浏览器打开本页，点「下载 APK」。</li>
-        <li>下载完成点「安装」，允许「安装未知应用」。</li>
-        <li>打开 App 输入账号登录。</li>
-        <li>进入主页点「启动」开始自动补分。</li>
-        <li>鸿蒙设备：经「卓易通」安装；签名冲突先卸载旧版。</li>
-      </ol>
-    </div>
-  </div>
+<!-- 更新日志 -->
+<section class="updates" id="updates">
+  <h2>更新日志</h2>
+  <ul>
+    <li><span class="t">彬煤答题助手 1.11.0 for Windows：微信绿主题界面、右上角账号菜单、底部状态栏</span><span class="d">09-18</span></li>
+    <li><span class="t">HarmonyOS 原生应用开放源码（ArkTS + ArkUI，与桌面端协议同源）</span><span class="d">09-18</span></li>
+    <li><span class="t">1.10.0：小窗登录、真安装（桌面快捷方式+系统卸载）、应用图标与版本信息</span><span class="d">09-18</span></li>
+    <li><span class="t">1.9.x：独立窗口版首发，内置在线更新与官网入口</span><span class="d">09-18</span></li>
+    <li><span class="t">安卓端 1.7.5：鸿蒙卓易通兼容（minSdk 31 + 双签名）</span><span class="d">09-18</span></li>
+  </ul>
 </section>
 
 <footer>
-  <div class="links">
-    <a href="https://github.com/qinlong9518/binmei-assistant">GitHub 仓库</a>·
-    <a href="https://github.com/qinlong9518/binmei-assistant/releases">历史版本</a>·
-    <a href="https://github.com/qinlong9518/binmei-assistant/issues">问题反馈</a>
+  <div>
+    <a href="https://github.com/qinlong9518/binmei-assistant" target="_blank">GitHub 仓库</a>·
+    <a href="https://github.com/qinlong9518/binmei-assistant/releases" target="_blank">历史版本</a>·
+    <a href="https://github.com/qinlong9518/binmei-assistant/issues" target="_blank">问题反馈</a>
   </div>
-  <div>本工具仅供学习交流使用，请合理合规使用。</div>
-  <div style="margin-top:6px">© 2026 彬煤答题助手</div>
+  <div class="cp">本工具仅供学习交流使用 · © 2026 彬煤答题助手</div>
 </footer>
 
 </body>
