@@ -13,15 +13,15 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-// UIBridge 绑定给前端 JS 的方法集（window.go.main.App.*）
-type UIBridge struct {
+// App 绑定给前端 JS 的方法集（window.go.main.App.*）
+type App struct {
 	ctx context.Context
 	mu  sync.Mutex
 }
 
-func NewBridge() *UIBridge { return &UIBridge{} }
+func NewBridge() *App { return &App{} }
 
-func (b *UIBridge) attach(ctx context.Context) {
+func (b *App) attach(ctx context.Context) {
 	b.ctx = ctx
 	bridgeRef = b
 	// 启动后台轮询（积分+UI 状态推送）
@@ -49,7 +49,7 @@ func (b *UIBridge) attach(ctx context.Context) {
 }
 
 // emit 向前端推事件（runtime.Events.Emit）
-func (b *UIBridge) emit(name string, data interface{}) {
+func (b *App) emit(name string, data interface{}) {
 	if b.ctx == nil {
 		return
 	}
@@ -119,12 +119,12 @@ func uiTick() {
 	}
 }
 
-var bridgeRef *UIBridge
+var bridgeRef *App
 
 // ---- 登录 ----
 
 // Login 登录（密码自动填充服务端默认值）
-func (b *UIBridge) Login(id string) string {
+func (b *App) Login(id string) string {
 	id = strings.TrimSpace(id)
 	if id == "" {
 		return "请输入账号"
@@ -143,7 +143,7 @@ func (b *UIBridge) Login(id string) string {
 }
 
 // Logout 登出
-func (b *UIBridge) Logout() {
+func (b *App) Logout() {
 	rt.mu.Lock()
 	if rt.running && rt.stopCh != nil {
 		close(rt.stopCh)
@@ -157,7 +157,7 @@ func (b *UIBridge) Logout() {
 
 // ---- 自动答题开关 ----
 
-func (b *UIBridge) ToggleRun() {
+func (b *App) ToggleRun() {
 	rt.mu.Lock()
 	c := rt.client
 	running := rt.running
@@ -188,12 +188,12 @@ func (b *UIBridge) ToggleRun() {
 // ---- 账号管理 ----
 
 // ListAccounts 返回本机保存的账号列表
-func (b *UIBridge) ListAccounts() []Account {
+func (b *App) ListAccounts() []Account {
 	return cfg.Accounts
 }
 
 // CurrentAccount 当前登录账号 ID
-func (b *UIBridge) CurrentAccount() string {
+func (b *App) CurrentAccount() string {
 	if c := rtClient(); c != nil {
 		return c.Account
 	}
@@ -201,7 +201,7 @@ func (b *UIBridge) CurrentAccount() string {
 }
 
 // SwitchAccount 切换账号
-func (b *UIBridge) SwitchAccount(id string) {
+func (b *App) SwitchAccount(id string) {
 	var acc *Account
 	for i := range cfg.Accounts {
 		if cfg.Accounts[i].ID == id {
@@ -232,7 +232,7 @@ func (b *UIBridge) SwitchAccount(id string) {
 }
 
 // DeleteAccount 删除账号记录（若删除的是当前登录账号则自动登出）
-func (b *UIBridge) DeleteAccount(id string) {
+func (b *App) DeleteAccount(id string) {
 	logout := removeAccount(id)
 	logf("🗑 已删除账号记录: %s", id)
 	if logout {
@@ -243,7 +243,7 @@ func (b *UIBridge) DeleteAccount(id string) {
 // ---- 更新 ----
 
 // CheckUpdate 检查并安装更新（有新版本时前端弹确认）
-func (b *UIBridge) CheckUpdate() {
+func (b *App) CheckUpdate() {
 	setStatus("检查更新中…")
 	go func() {
 		meta, err := fetchUpdateMeta()
@@ -261,7 +261,7 @@ func (b *UIBridge) CheckUpdate() {
 }
 
 // DoUpdate 确认后下载安装
-func (b *UIBridge) DoUpdate() {
+func (b *App) DoUpdate() {
 	go func() {
 		meta, err := fetchUpdateMeta()
 		if err != nil {
@@ -288,11 +288,11 @@ func (b *UIBridge) DoUpdate() {
 }
 
 // GetPendingUpdate 前端加载后主动查询待提醒的更新（防止事件早于监听注册丢失）
-func (b *UIBridge) GetPendingUpdate() string {
+func (b *App) GetPendingUpdate() string {
 	return pendingUpdate
 }
 
 // OpenSite 打开官网
-func (b *UIBridge) OpenSite() {
+func (b *App) OpenSite() {
 	openURL(OfficialSite)
 }
