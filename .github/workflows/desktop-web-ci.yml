@@ -53,7 +53,7 @@ jobs:
               Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
               exit 1
             }
-            if ($title -ne [string]::Empty -and $title -notlike '*彬煤答题助手*') {
+            if ($title -ne [string]::Empty -and $title -notlike '*彬煤助手*') {
               Write-Host "::warning::unexpected window title"
             }
             Write-Host "WINDOW OK - process alive PID=$($p.Id)"
