@@ -114,7 +114,7 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
   <input id="accInput" class="input" placeholder="请输入身份证账号" autocomplete="off">
   <button id="loginBtn" class="btn-green">登 录</button>
   <div class="login-err" id="loginErr"></div>
-  <div class="login-foot">v1.13.2 · 官网 qinlong9518.github.io/binmei-assistant</div>
+  <div class="login-foot">v1.13.3 · 官网 qinlong9518.github.io/binmei-assistant</div>
 </div>
 
 <!-- 主视图 -->
@@ -144,7 +144,7 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
     <a href="#" id="siteLink">官网</a>
     <button id="updBtn">检查更新</button>
     <div class="dlprog" id="dlprog"><div class="dlbar"><i id="dlbarFill"></i></div><span id="dlpct">0%</span></div>
-    <span class="ver" id="verTag">v1.13.2</span>
+    <span class="ver" id="verTag">v1.13.3</span>
   </div>
 </div>
 
@@ -173,7 +173,15 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
 
 <script>
 const $ = id => document.getElementById(id);
-const bridge = window.go && window.go.main && window.go.main.App ? window.go.main.App : null;
+// Wails 的 Go 绑定是异步注入的：必须动态获取并等待就绪（修复 null (reading 'Login')）
+async function getBridge(){
+  if (window.go && window.go.main && window.go.main.App) return window.go.main.App;
+  for (let i = 0; i < 100; i++) {
+    await new Promise(r => setTimeout(r, 100));
+    if (window.go && window.go.main && window.go.main.App) return window.go.main.App;
+  }
+  throw new Error('服务初始化超时，请重启程序');
+}
 
 function toast(msg){
   const t = $('toast'); t.textContent = msg; t.classList.add('on');
@@ -190,7 +198,8 @@ $('loginBtn').onclick = async () => {
   if(!acc){ $('loginErr').textContent = '请输入账号'; return; }
   const btn = $('loginBtn'); btn.disabled = true; btn.textContent = '登录中…'; $('loginErr').textContent='';
   try{
-    const err = await bridge.Login(acc);
+    const b = await getBridge();
+    const err = await b.Login(acc);
     if(err){ $('loginErr').textContent = err; }
   }catch(e){ $('loginErr').textContent = String(e); }
   btn.disabled = false; btn.textContent = '登 录';
@@ -198,19 +207,20 @@ $('loginBtn').onclick = async () => {
 $('accInput').addEventListener('keydown', e => { if(e.key==='Enter') $('loginBtn').click(); });
 
 /* ---- 主界面事件 ---- */
-$('runBtn').onclick = () => bridge.ToggleRun();
-$('siteLink').onclick = e => { e.preventDefault(); bridge.OpenSite(); };
-$('updBtn').onclick = () => bridge.CheckUpdate();
+$('runBtn').onclick = async () => { try{ (await getBridge()).ToggleRun(); }catch(e){ toast(String(e)); } };
+$('siteLink').onclick = async e => { e.preventDefault(); try{ (await getBridge()).OpenSite(); }catch(err){} };
+$('updBtn').onclick = async () => { try{ (await getBridge()).CheckUpdate(); }catch(e){ toast(String(e)); } };
 $('userChip').onclick = openAcc;
 
 function closeUpd(){ $('updMask').classList.remove('on'); }
 function closeAcc(){ $('accMask').classList.remove('on'); }
-$('updOkBtn').onclick = () => { closeUpd(); $('dlprog').classList.add('on'); bridge.DoUpdate(); };
+$('updOkBtn').onclick = async () => { closeUpd(); $('dlprog').classList.add('on'); try{ (await getBridge()).DoUpdate(); }catch(e){ toast(String(e)); } };
 
 /* ---- 账号管理 ---- */
 async function openAcc(){
-  const cur = await bridge.CurrentAccount();
-  const list = await bridge.ListAccounts() || [];
+  const b = await getBridge();
+  const cur = await b.CurrentAccount();
+  const list = await b.ListAccounts() || [];
   const box = $('accList');
   if(!list.length){ box.innerHTML = '<div class="acc-empty">暂无保存的账号</div>'; }
   else {
@@ -219,11 +229,11 @@ async function openAcc(){
       const div = document.createElement('div');
       div.className = 'acc-item' + (a.id===cur ? ' cur' : '');
       div.innerHTML = '<span>👤 '+a.name+'（'+a.id+'）</span>' + (a.id===cur?'<span style="font-size:11px">当前</span>':'<span class="del">✕</span>');
-      div.onclick = ev => {
+      div.onclick = async ev => {
         if(ev.target.classList.contains('del')){
-          bridge.DeleteAccount(a.id); div.remove(); toast('已删除记录');
+          (await getBridge()).DeleteAccount(a.id); div.remove(); toast('已删除记录');
         } else if(a.id!==cur){
-          bridge.SwitchAccount(a.id); closeAcc(); toast('切换中…');
+          (await getBridge()).SwitchAccount(a.id); closeAcc(); toast('切换中…');
         }
       };
       box.appendChild(div);
