@@ -42,6 +42,10 @@ func main() {
 	cleanupOld()
 	// 安装引导：未安装 → 询问安装（系统级弹窗）→ 从安装目录重启
 	ensureInstalledFlow()
+	// WebView2 检测：缺失时中文提示并自动静默安装（替代 Wails 英文弹窗）
+	if !ensureWebview2() {
+		return
+	}
 
 	bridge := NewBridge()
 
