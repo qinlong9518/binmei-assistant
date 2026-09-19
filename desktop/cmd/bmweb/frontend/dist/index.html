@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>彬煤答题助手</title>
+<title>彬煤答题助手 v1.15.0</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none}
 html,body{height:100%;overflow:hidden}
@@ -79,9 +79,10 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
 .login-err{font-size:12px;color:#E6503C;text-align:center;min-height:18px;margin-top:10px}
 .login-foot{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;color:#b0bab5}
 
-/* ===== 弹窗 ===== */
+/* ===== 弹窗（点遮罩自动关闭） ===== */
 .mask{position:fixed;inset:0;background:rgba(15,26,20,.45);display:none;align-items:center;justify-content:center;z-index:50}
 .mask.on{display:flex}
+.mask .modal{cursor:default}
 .modal{background:#fff;border-radius:16px;width:86%;max-width:330px;padding:20px;box-shadow:0 12px 40px rgba(0,0,0,.2)}
 .modal h3{font-size:15px;color:#22312a;margin-bottom:10px}
 .modal .body{font-size:13px;color:#4d5a54;line-height:1.7;white-space:pre-wrap;max-height:260px;overflow-y:auto;-webkit-user-select:text;user-select:text}
@@ -114,14 +115,14 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
   <input id="accInput" class="input" placeholder="请输入身份证账号" autocomplete="off">
   <button id="loginBtn" class="btn-green">登 录</button>
   <div class="login-err" id="loginErr"></div>
-  <div class="login-foot">v1.14.4 · 官网 qinlong9518.github.io/bmzs</div>
+  <div class="login-foot">v1.15.0 · 官网 qinlong9518.github.io/bmzs</div>
 </div>
 
 <!-- 主视图 -->
 <div id="appView" style="display:none;flex:1;flex-direction:column;min-height:0">
   <div class="topbar">
     <div class="topbar-row">
-      <div class="brand">彬煤答题助手<small>自动答题 · 积分管理</small></div>
+      <div class="brand">彬煤答题助手</div>
       <button id="userChip" class="user-chip">未登录 ▾</button>
     </div>
   </div>
@@ -132,6 +133,7 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
         <span class="task-dot" id="taskDot"></span>
         <span class="task-txt" id="taskTxt">未启动 · 点「启动」自动补分</span>
         <button id="runBtn" class="btn-main btn-start">启动</button>
+      </div>
       <div class="hint">不足 24 分自动开考（优先试卷二）· 3 秒轮询 · 手机/模拟考试</div>
     </div>
     <div class="card card-log">
@@ -139,12 +141,10 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
       <div class="logbox" id="logbox">等待任务…</div>
     </div>
   </div>
-  </div>
   <div class="foot">
-    <a href="#" id="siteLink">官网</a>
-    <button id="updBtn">检查更新</button>
+    <a href="#" id="siteLink">官网：qinlong9518.github.io/bmzs</a>
     <div class="dlprog" id="dlprog"><div class="dlbar"><i id="dlbarFill"></i></div><span id="dlpct">0%</span></div>
-    <span class="ver" id="verTag">v1.14.4</span>
+    <button id="updBtn" style="margin-left:auto">检查更新</button>
   </div>
 </div>
 
@@ -154,8 +154,7 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
     <h3>发现新版本</h3>
     <div class="body" id="updBody"></div>
     <div class="acts">
-      <button class="acts-btn btn-cancel" onclick="closeUpd()">以后再说</button>
-      <button class="btn-ok" id="updOkBtn">立即更新</button>
+      <button class="btn-ok" style="flex:1" id="updOkBtn">立即更新</button>
     </div>
   </div>
 </div>
@@ -168,7 +167,6 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
     <div class="acts" id="accLogoutRow" style="display:none">
       <button class="btn-ok" style="background:#fff;color:#E6503C;border:1px solid #E6503C" id="accLogoutBtn">退出登录（切换账号）</button>
     </div>
-    <div class="acts"><button class="btn-cancel" style="flex:1" onclick="closeAcc()">关闭</button></div>
   </div>
 </div>
 
@@ -258,6 +256,16 @@ async function openAcc(){
 /* ---- 状态渲染 ---- */
 function fmtPts(v){ return Number.isInteger(v) ? v : v.toFixed(1); }
 let lastLogs = '';
+// 状态栏：提示显示 3 秒后恢复"检查更新"
+let statusTimer = null;
+function applyStatus(s){
+  const btn = document.getElementById('updBtn');
+  if(!s){ btn.textContent = '检查更新'; return; }
+  btn.textContent = s;
+  clearTimeout(statusTimer);
+  statusTimer = setTimeout(()=>{ btn.textContent = '检查更新'; }, 3000);
+}
+
 function renderState(s){
   if(s.loggedIn){
     showApp();
@@ -295,9 +303,8 @@ function renderState(s){
     if(stick) lb.scrollTop = lb.scrollHeight;
   }
   // 状态栏
-  if(s.status !== undefined) $('updBtn').textContent = s.status || '检查更新';
+  if(s.status !== undefined) applyStatus(s.status);
 }
-function sig(pts){ return pts.map(p=>p.name+p.cur).join('|'); }
 
 /* ---- Wails 事件 ---- */
 if(window.runtime){
@@ -316,6 +323,10 @@ function showUpd(info){
   $('updBody').textContent = '新版本 '+lines[0]+'\n\n'+lines.slice(1).join('\n').trim();
   $('updMask').classList.add('on');
 }
+
+/* 点弹窗外（遮罩）自动关闭 */
+$('updMask').addEventListener('click', e => { if(e.target === $('updMask')) closeUpd(); });
+$('accMask').addEventListener('click', e => { if(e.target === $('accMask')) closeAcc(); });
 
 /* 启动后主动查一次待提醒（后端 5 秒首查可能早于前端监听注册，双保险） */
 (async () => {
