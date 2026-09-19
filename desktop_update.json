@@ -1,7 +1,7 @@
 {
-  "versionCode": 12,
-  "versionName": "1.13.3",
-  "changelog": "修复登录按钮报错（界面服务初始化时序问题）",
+  "versionCode": 13,
+  "versionName": "1.14.0",
+  "changelog": "新版本自动弹窗提醒（启动时+每4小时自动检查），无需手动点检查更新",
   "exeUrl": "https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-web.exe",
   "force": false
 }
