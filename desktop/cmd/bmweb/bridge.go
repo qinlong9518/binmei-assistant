@@ -26,6 +26,7 @@ func (b *App) attach(ctx context.Context) {
 	bridgeRef = b
 	// 启动后台轮询（积分+UI 状态推送）
 	go uiTick()
+	go pointsPoller()
 	// 已有历史账号 → 静默恢复登录（微信式记住登录）
 	if cfg.Last != "" {
 		for _, a := range cfg.Accounts {
@@ -105,6 +106,22 @@ func setStatus(s string) {
 	rt.mu.Lock()
 	statusMsg = s
 	rt.mu.Unlock()
+}
+
+// pointsPoller 积分自动轮询：登录后即拉取（无需点启动），3 秒一次
+func pointsPoller() {
+	for {
+		time.Sleep(3 * time.Second)
+		c := rtClient()
+		if c == nil {
+			continue
+		}
+		if pts, err := c.GetPoints(); err == nil {
+			rt.mu.Lock()
+			rt.lastPts = pts
+			rt.mu.Unlock()
+		}
+	}
 }
 
 // uiTick 500ms 推一次全量状态（前端按需 diff）
@@ -283,7 +300,11 @@ func (b *App) DoUpdate() {
 			}
 			return
 		}
-		setStatus("已下载，重启后生效")
+		// 便携模式（未安装）：同样自替换重启，无需用户手动
+		setStatus("安装更新…")
+		if err := selfReplace(tmp); err != nil {
+			setStatus("更新失败: " + err.Error())
+		}
 	}()
 }
 
