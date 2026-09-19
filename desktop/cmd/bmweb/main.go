@@ -49,7 +49,7 @@ func main() {
 	bridge := NewBridge()
 
 	err := wails.Run(&options.App{
-		Title:     "彬煤助手",
+		Title:     "彬煤助手 v" + AppVersion,
 		Width:     400,
 		Height:    650,
 		MinWidth:  360,
