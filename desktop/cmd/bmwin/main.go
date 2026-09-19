@@ -199,14 +199,14 @@ func runLoginDialog() (*bm.Client, bool) {
 
 	dialogErr := (Dialog{
 		AssignTo:      &dlg,
-		Title:         "彬煤答题助手 - 登录",
+		Title:         "彬煤助手 - 登录",
 		MinSize:       Size{Width: 340, Height: 200},
 		MaxSize:       Size{Width: 340, Height: 200},
 		DefaultButton: &acceptPB,
 		CancelButton:  &cancelPB,
 		Layout:        VBox{Margins: Margins{Left: 20, Top: 16, Right: 20, Bottom: 14}, Spacing: 10},
 		Children: []Widget{
-			Label{Text: "彬煤答题助手", Font: Font{PointSize: 13, Bold: true}},
+			Label{Text: "彬煤助手", Font: Font{PointSize: 13, Bold: true}},
 			Label{AssignTo: &statusLb, Text: "输入账号登录（密码自动填充）", TextColor: walk.RGB(130, 130, 130)},
 			LineEdit{AssignTo: &le, CueBanner: "身份证账号"},
 			Composite{
@@ -349,7 +349,7 @@ func (m *comboBoxModel) Value(i int) interface{} { return m.items[i] }
 func buildMainWindow() error {
 	return (MainWindow{
 		AssignTo: &mw,
-		Title:    "彬煤答题助手",
+		Title:    "彬煤助手",
 		MinSize:  Size{Width: 400, Height: 590},
 		Layout:   VBox{MarginsZero: true, Spacing: 0},
 		Children: []Widget{
@@ -358,7 +358,7 @@ func buildMainWindow() error {
 				Layout:     HBox{Margins: Margins{Left: 14, Top: 12, Right: 14, Bottom: 12}},
 				Background: SolidColorBrush{Color: walk.RGB(7, 193, 96)},
 				Children: []Widget{
-					Label{Text: "彬煤答题助手", TextColor: walk.RGB(255, 255, 255),
+					Label{Text: "彬煤助手", TextColor: walk.RGB(255, 255, 255),
 						Font: Font{PointSize: 13, Bold: true}},
 					HSpacer{},
 					LinkLabel{AssignTo: &userLink, Text: "未登录 ▼",
