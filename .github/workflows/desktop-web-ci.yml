@@ -1,0 +1,57 @@
+name: desktop-web-ci
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "desktop/**"
+      - ".github/workflows/desktop-web-ci.yml"
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - name: Ensure WebView2 runtime
+        shell: pwsh
+        run: |
+          $key = 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}'
+          if (-not (Test-Path $key)) {
+            Write-Host 'WebView2 not found, installing evergreen bootstrapper...'
+            Invoke-WebRequest -Uri 'https://go.microsoft.com/fwlink/p/?linkid=2124701' -OutFile '$env:TEMP\webview2setup.exe'
+            Start-Process -FilePath '$env:TEMP\webview2setup.exe' -Args '/silent /install' -Wait
+          } else {
+            Write-Host 'WebView2 runtime already present'
+          }
+      - name: Build with icon and versioninfo
+        run: |
+          go run github.com/akavel/rsrc@v0.10.2 -ico cmd/bmweb/app.ico -manifest cmd/bmweb/app.manifest -arch amd64 -o cmd/bmweb/rsrc_windows_amd64.syso
+          go run github.com/josephspurrier/goversioninfo/cmd/goversioninfo@v1.4.0 -platform-specific -o cmd/bmweb/rsrc_version_windows_amd64.syso cmd/bmweb/versioninfo.json
+          go build -v -trimpath -ldflags "-s -w -H windowsgui" -o binmei-web.exe ./cmd/bmweb
+      - name: Smoke test
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath ".\binmei-web.exe" -PassThru
+          Start-Sleep -Seconds 8
+          if ($p.HasExited) {
+            Write-Host "::error::process exited early ExitCode=$($p.ExitCode)"
+            if (Test-Path "$env:LOCALAPPDATA\Programs\BinmeiAssistant\bm_crash.log") {
+              Write-Host "--- crash log ---"
+              Get-Content "$env:LOCALAPPDATA\Programs\BinmeiAssistant\bm_crash.log"
+            }
+            exit 1
+          } else {
+            Write-Host "WINDOW OK - process alive PID=$($p.Id)"
+            $v = (Get-Item ".\binmei-web.exe").VersionInfo
+            Write-Host "ProductName=$($v.ProductName) FileVersion=$($v.FileVersion)"
+            Stop-Process -Id $p.Id -Force
+          }
+      - name: Upload exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: binmei-web
+          path: desktop/binmei-web.exe
