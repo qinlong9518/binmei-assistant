@@ -1,7 +1,7 @@
 {
-  "versionCode": 17,
-  "versionName": "1.14.4",
-  "changelog": "仓库更名为 bmzs，程序内全部地址同步（官网/更新源/下载镜像）",
+  "versionCode": 18,
+  "versionName": "1.15.0",
+  "changelog": "重复下载自动覆盖安装（快捷方式即新版本）；顶栏精简；弹窗点外关闭；底栏布局优化；窗口标题带版本号",
   "exeUrl": "https://github.com/qinlong9518/bmzs/releases/latest/download/binmei-web.exe",
   "force": false
 }
