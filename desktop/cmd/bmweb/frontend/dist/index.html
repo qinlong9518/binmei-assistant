@@ -114,7 +114,7 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
   <input id="accInput" class="input" placeholder="请输入身份证账号" autocomplete="off">
   <button id="loginBtn" class="btn-green">登 录</button>
   <div class="login-err" id="loginErr"></div>
-  <div class="login-foot">v1.14.2 · 官网 qinlong9518.github.io/binmei-assistant</div>
+  <div class="login-foot">v1.14.3 · 官网 qinlong9518.github.io/binmei-assistant</div>
 </div>
 
 <!-- 主视图 -->
@@ -144,7 +144,7 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
     <a href="#" id="siteLink">官网</a>
     <button id="updBtn">检查更新</button>
     <div class="dlprog" id="dlprog"><div class="dlbar"><i id="dlbarFill"></i></div><span id="dlpct">0%</span></div>
-    <span class="ver" id="verTag">v1.14.2</span>
+    <span class="ver" id="verTag">v1.14.3</span>
   </div>
 </div>
 
@@ -165,6 +165,9 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
   <div class="modal">
     <h3>账号管理</h3>
     <div class="body" id="accList" style="max-height:220px"></div>
+    <div class="acts" id="accLogoutRow" style="display:none">
+      <button class="btn-ok" style="background:#fff;color:#E6503C;border:1px solid #E6503C" id="accLogoutBtn">退出登录（切换账号）</button>
+    </div>
     <div class="acts"><button class="btn-cancel" style="flex:1" onclick="closeAcc()">关闭</button></div>
   </div>
 </div>
@@ -209,6 +212,10 @@ $('loginBtn').onclick = async () => {
   btn.disabled = false; btn.textContent = '登 录';
 };
 $('accInput').addEventListener('keydown', e => { if(e.key==='Enter') $('loginBtn').click(); });
+$('accLogoutBtn').onclick = async () => {
+  try{ (await getBridge()).Logout(); }catch(e){}
+  closeAcc(); toast('已退出登录，请输入其他账号');
+};
 
 /* ---- 主界面事件 ---- */
 $('runBtn').onclick = async () => { try{ (await getBridge()).ToggleRun(); }catch(e){ toast(String(e)); } };
@@ -225,6 +232,8 @@ async function openAcc(){
   const b = await getBridge();
   const cur = await b.CurrentAccount();
   const list = await b.ListAccounts() || [];
+  // 已登录时显示退出登录按钮
+  $('accLogoutRow').style.display = cur ? 'flex' : 'none';
   const box = $('accList');
   if(!list.length){ box.innerHTML = '<div class="acc-empty">暂无保存的账号</div>'; }
   else {
