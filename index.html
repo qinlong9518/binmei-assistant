@@ -18,8 +18,9 @@ ul{list-style:none}
 .head{align-items:center;background-color:#2aae67;box-sizing:border-box;display:flex;padding:0 20px;position:fixed;top:0;width:100%;height:81px;z-index:100}
 .logo{align-items:center;display:flex;gap:8px;color:#fff;font-size:17px;font-weight:700;white-space:nowrap}
 .logo svg{width:26px;height:26px;flex:none}
-.head-links{margin-left:auto;display:flex;gap:22px;align-items:center}
-.head-links a{color:hsla(0,0%,100%,.9);font-size:16px;white-space:nowrap}
+.head-links{margin-left:auto;display:flex;gap:0;align-items:center}
+.head-links a{color:hsla(0,0%,100%,.9);font-size:16px;white-space:nowrap;padding:0 18px}
+.head-links a:not(:last-child):after{content:"｜";margin-left:36px;color:hsla(0,0%,100%,.5)}
 .head-links a:hover{color:#fff}
 /* 手机端：只保留更新日志，隐藏下载/GitHub（放不下会跨行） */
 @media (max-width:640px){
