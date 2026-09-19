@@ -318,17 +318,17 @@ func upsertAccount(id, name string) {
 
 // ---------- 主窗口 ----------
 var (
-	mw          *walk.MainWindow
-	userLink    *walk.LinkLabel
-	verLabel    *walk.Label
-	siteLink    *walk.LinkLabel
-	updLink     *walk.LinkLabel
-	ptLabels    [6]*walk.Label
-	taskLabel   *walk.Label
-	btnToggle   *walk.PushButton
-	logEdit     *walk.TextEdit
-	pb          *walk.ProgressBar
-	statusLabel *walk.Label
+	mw           *walk.MainWindow
+	userLink     *walk.LinkLabel
+	siteLink     *walk.LinkLabel
+	updLink      *walk.LinkLabel
+	verLabel2    *walk.Label
+	taskLabel    *walk.Label
+	btnToggle    *walk.PushButton
+	logEdit      *walk.TextEdit
+	pb           *walk.ProgressBar
+	statusLabel  *walk.Label
+	pointsCanvas *walk.CustomWidget
 
 	uiLock     bool
 	appQuiting bool
@@ -373,17 +373,13 @@ func buildMainWindow() error {
 			Composite{
 				Layout: VBox{Margins: Margins{Left: 12, Top: 10, Right: 12, Bottom: 4}, Spacing: 8},
 				Children: []Widget{
-					GroupBox{
-						Title:  "今日积分",
-						Layout: Grid{Columns: 3, Spacing: 6},
-						Children: []Widget{
-							Label{AssignTo: &ptLabels[0], Text: "签到  -"},
-							Label{AssignTo: &ptLabels[1], Text: "知识学习  -"},
-							Label{AssignTo: &ptLabels[2], Text: "手机考试  -"},
-							Label{AssignTo: &ptLabels[3], Text: "模拟考试  -"},
-							Label{AssignTo: &ptLabels[4], Text: "手机练习  -"},
-							Label{AssignTo: &ptLabels[5], Text: "视频学习  -"},
-						},
+					// 自绘积分面板（渐变卡美化）
+					CustomWidget{
+						AssignTo:      &pointsCanvas,
+						MinSize:       Size{Height: 178},
+						Paint:         paintPointsCanvas,
+						PaintMode:     PaintNormal,
+						InvalidatesOnResize: true,
 					},
 					GroupBox{
 						Title:  "自动答题（不足24分自动补足·选试卷二）",
@@ -420,7 +416,7 @@ func buildMainWindow() error {
 							}
 						}},
 					HSpacer{},
-					Label{AssignTo: &verLabel, Text: "v" + AppVersion,
+					Label{AssignTo: &verLabel2, Text: "v" + AppVersion,
 						TextColor: walk.RGB(150, 150, 150)},
 				},
 			},
@@ -684,44 +680,27 @@ func onCheckUpdateClicked() {
 }
 
 // ---------- UI 刷新 ----------
-
 func updateUI() {
 	if appQuiting {
 		return
 	}
 	rt.mu.Lock()
-	pts := rt.lastPts
 	running := rt.running
 	taskMsg := rt.taskMsg
 	logs := strings.Join(rt.logs, "\n")
 	client := rt.client
 	rt.mu.Unlock()
 
-	byName := map[string]bm.PointsDetail{}
-	for _, p := range pts {
-		byName[p.Name] = p
-	}
-	for i, name := range pointNames() {
-		if p, ok := byName[name]; ok {
-			full := p.Cur >= p.Max
-			ptLabels[i].SetText(fmt.Sprintf("%s  %g/%g", name, p.Cur, p.Max))
-			if full {
-				ptLabels[i].SetTextColor(walk.RGB(7, 193, 96))
-			} else {
-				ptLabels[i].SetTextColor(walk.RGB(230, 80, 60))
-			}
-		} else {
-			ptLabels[i].SetText(name + "  -")
-			ptLabels[i].SetTextColor(walk.RGB(120, 120, 120))
-		}
-	}
-
+	// 积分由自绘面板渲染（paint.go），这里不再逐 Label 设置
 	if c := client; c != nil {
 		userLink.SetText("👤 " + c.Name + " ▼")
 	} else {
 		userLink.SetText("未登录 ▼")
 	}
-
+	// 自绘积分面板重绘
+	if pointsCanvas != nil {
+		pointsCanvas.Invalidate()
+	}
 	if running {
 		if taskMsg == "" {
 			taskMsg = "监控中（3秒轮询）"
