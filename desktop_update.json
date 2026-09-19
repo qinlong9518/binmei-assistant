@@ -1,7 +1,7 @@
 {
-  "versionCode": 14,
-  "versionName": "1.14.1",
-  "changelog": "修复'服务初始化超时'——绑定名与前端不匹配导致登录/按钮全部失效，已根治",
+  "versionCode": 15,
+  "versionName": "1.14.2",
+  "changelog": "界面布局优化：主窗口固定高度不再出滚动条，日志区内部滚动；官网字体加大、加载回到顶部",
   "exeUrl": "https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-web.exe",
   "force": false
 }
