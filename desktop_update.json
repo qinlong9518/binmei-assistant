@@ -1,7 +1,7 @@
 {
-  "versionCode": 10,
-  "versionName": "1.13.1",
-  "changelog": "修复启动报错问题（构建标签缺失），界面与功能不变",
+  "versionCode": 11,
+  "versionName": "1.13.2",
+  "changelog": "缺失系统组件时自动静默下载安装（中文提示），全程无需手动操作",
   "exeUrl": "https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-web.exe",
   "force": false
 }
