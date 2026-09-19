@@ -14,7 +14,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -58,10 +57,7 @@ func main() {
 		AssetServer: &assetserver.Options{Assets: assets},
 		OnStartup: func(ctx context.Context) {
 			bridge.attach(ctx)
-			go func() {
-				time.Sleep(2 * time.Second)
-				silentCheckUpdate()
-			}()
+			go updateWatchdog()
 		},
 		Bind:      []interface{}{bridge},
 		Windows: &windows.Options{
