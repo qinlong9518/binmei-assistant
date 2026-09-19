@@ -7,7 +7,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none}
 html,body{height:100%;overflow:hidden}
-body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;background:#F3F6F4;display:flex;flex-direction:column}
+body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;background:#F3F6F4;display:flex;flex-direction:column;overflow:hidden}
 
 /* ===== 顶栏：微信绿渐变 ===== */
 .topbar{flex:none;background:linear-gradient(135deg,#07C160,#06AD56);color:#fff;padding:14px 16px 12px;
@@ -20,20 +20,20 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
 .user-chip:hover{background:rgba(255,255,255,.3)}
 .user-chip:disabled{opacity:.6;cursor:default}
 
-/* ===== 主体 ===== */
-.main{flex:1;overflow-y:auto;padding:14px 14px 8px;-webkit-user-select:text;user-select:text}
+/* ===== 主体：flex 纵向布局，固定视口内不出滚动条 ===== */
+.main{flex:1;display:flex;flex-direction:column;padding:14px 14px 8px;min-height:0;overflow:hidden}
 
-/* 积分卡 3×2 */
-.points{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px}
+/* 积分卡 3×2（固定高度，获取中时也占位，防止页面跳动） */
+.points{flex:none;display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px}
 .pt{background:#fff;border-radius:14px;padding:12px 6px 10px;text-align:center;
   box-shadow:0 1px 4px rgba(0,0,0,.05);border:1px solid #EDF2EE}
 .pt .n{font-size:11px;color:#8a9691;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pt .v{font-size:17px;font-weight:700;color:#07C160}
 .pt.miss .v{color:#E6503C}
 .pt.pending .v{color:#C3CCC7;font-size:13px;padding-top:3px}
-
-/* 状态卡 */
-.card{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.05);border:1px solid #EDF2EE}
+/* 状态卡 + 日志卡自适应：日志区 flex:1 占满剩余空间，内部滚动 */
+.card{flex:none;background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.05);border:1px solid #EDF2EE}
+.card-log{flex:1;display:flex;flex-direction:column;min-height:80px;margin-bottom:0}
 .task-row{display:flex;align-items:center;gap:10px}
 .task-dot{width:9px;height:9px;border-radius:50%;background:#C3CCC7;flex:none}
 .task-dot.on{background:#07C160;box-shadow:0 0 0 3px rgba(7,193,96,.15)}
@@ -46,8 +46,8 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
 .hint{font-size:11px;color:#9aa5a0;margin-top:8px;line-height:1.6}
 
 /* 日志卡 */
-.card-title{font-size:12px;color:#8a9691;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-.logbox{background:#0F1A14;border-radius:10px;padding:10px 12px;height:190px;overflow-y:auto;
+.card-title{flex:none;font-size:12px;color:#8a9691;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.logbox{flex:1;min-height:60px;background:#0F1A14;border-radius:10px;padding:10px 12px;overflow-y:auto;
   font-family:Consolas,monospace;font-size:11px;line-height:1.75;color:#9fd8b4;white-space:pre-wrap;word-break:break-all}
 
 /* ===== 底部状态栏 ===== */
@@ -114,7 +114,7 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
   <input id="accInput" class="input" placeholder="请输入身份证账号" autocomplete="off">
   <button id="loginBtn" class="btn-green">登 录</button>
   <div class="login-err" id="loginErr"></div>
-  <div class="login-foot">v1.14.1 · 官网 qinlong9518.github.io/binmei-assistant</div>
+  <div class="login-foot">v1.14.2 · 官网 qinlong9518.github.io/binmei-assistant</div>
 </div>
 
 <!-- 主视图 -->
@@ -132,19 +132,19 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
         <span class="task-dot" id="taskDot"></span>
         <span class="task-txt" id="taskTxt">未启动 · 点「启动」自动补分</span>
         <button id="runBtn" class="btn-main btn-start">启动</button>
-      </div>
       <div class="hint">不足 24 分自动开考（优先试卷二）· 3 秒轮询 · 手机/模拟考试</div>
     </div>
-    <div class="card">
+    <div class="card card-log">
       <div class="card-title"><span>运行日志</span><span id="logCount"></span></div>
       <div class="logbox" id="logbox">等待任务…</div>
     </div>
+  </div>
   </div>
   <div class="foot">
     <a href="#" id="siteLink">官网</a>
     <button id="updBtn">检查更新</button>
     <div class="dlprog" id="dlprog"><div class="dlbar"><i id="dlbarFill"></i></div><span id="dlpct">0%</span></div>
-    <span class="ver" id="verTag">v1.14.1</span>
+    <span class="ver" id="verTag">v1.14.2</span>
   </div>
 </div>
 
@@ -256,7 +256,8 @@ function renderState(s){
     // 积分卡
     const el = $('points');
     if(!s.points || !s.points.length){
-      el.innerHTML = '<div class="pt pending" style="grid-column:1/-1"><div class="v">获取积分中…</div></div>';
+      // 6 张占位卡：保持 3×2 两行高度，页面不跳动、不出滚动条
+      el.innerHTML = Array(6).fill('<div class="pt"><div class="n">&nbsp;</div><div class="v" style="color:#C3CCC7">—</div></div>').join('');
     } else if(el.childElementCount !== s.points.length || el.dataset.sig !== sig(s.points)){
       el.dataset.sig = sig(s.points);
       el.innerHTML = s.points.map(p =>
