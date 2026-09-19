@@ -1,7 +1,7 @@
 {
-  "versionCode": 7,
-  "versionName": "1.11.0",
-  "changelog": "绿色主题界面；紧凑窗口；右上角账号下拉；底部状态栏",
+  "versionCode": 8,
+  "versionName": "1.12.0",
+  "changelog": "积分面板美化：渐变顶栏 + 圆角积分卡片（GDI 自绘）",
   "exeUrl": "https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-desktop.exe",
   "force": false
 }
