@@ -32,14 +32,14 @@ ul{list-style:none}
 .banner__logo{height:72px;width:100%;display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:400;color:#fff;white-space:nowrap;padding:0 16px;letter-spacing:3px;font-family:"WeChat Sans Std","WeChat Sans","PingFang SC","Microsoft YaHei","Source Han Sans SC",sans-serif}
 
 /* 更新日志 */
-.banner__update-log{padding:24px 0 0;position:relative;width:min(500px,88%)}
+.banner__update-log{padding:40px 0 0;position:relative;width:min(500px,88%)}
 .banner__update-log:before{border-top:1px solid hsla(0,0%,100%,.3);content:"";display:block;left:0;position:absolute;top:0;transform:scaleY(.5);transform-origin:left top;width:100%}
-.banner__update-log li{display:flex;margin-bottom:10px}
+.banner__update-log li{display:flex;margin-bottom:18px;line-height:1.8}
 .banner__update-log li:last-child{margin-bottom:0}
-.banner__update-log a{color:hsla(0,0%,100%,.9);font-size:17px;cursor:default}
-.banner__update-content{align-items:center;display:flex;flex:1;line-height:1.4;overflow:hidden}
-.banner__updata-time{color:hsla(0,0%,100%,.7);font-variant-numeric:tabular-nums;margin-left:16px;font-size:16px}
-.banner__update-more{color:hsla(0,0%,100%,.9);display:inline-block;margin-top:16px;font-size:16px}
+.banner__update-log a{color:hsla(0,0%,100%,.9);font-size:19px;cursor:default}
+.banner__update-content{align-items:center;display:flex;flex:1;line-height:1.8;overflow:hidden}
+.banner__updata-time{color:hsla(0,0%,100%,.7);font-variant-numeric:tabular-nums;margin-left:16px;font-size:18px}
+.banner__update-more{color:hsla(0,0%,100%,.9);display:inline-block;margin-top:20px;font-size:18px}
 .banner__update-more:after{content:">";display:inline-block;margin-left:5px}
 
 /* 圆形平台下载按钮（微信式：flex 居中，自动换行也居中） */
@@ -87,6 +87,8 @@ ul{list-style:none}
 .updates{max-width:680px;margin:64px auto 0;padding:0 24px 80px}
 .updates h2{text-align:center;font-size:26px;font-weight:400;margin-bottom:30px}
 .updates ul{border-top:1px solid rgba(0,0,0,.08)}
+.updates ul{max-height:calc(5 * 3em);overflow:hidden;position:relative}
+.updates ul:after{content:"";position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(rgba(255,255,255,0),#fff);pointer-events:none}
 .updates li{display:flex;align-items:center;padding:14px 4px;border-bottom:1px solid rgba(0,0,0,.06);font-size:15px}
 .updates li .t{flex:1;color:rgba(0,0,0,.75)}
 .updates li .d{color:rgba(0,0,0,.4);font-variant-numeric:tabular-nums}
@@ -100,7 +102,7 @@ footer .cp{margin-top:10px;color:hsla(0,0%,100%,.6)}
 
 <!-- 顶部绿色横条 -->
 <header class="head">
-  <div class="logo">彬煤答题助手</div>
+  <div style="flex:1"></div>
   <div class="head-links">
     <a href="#download">下载</a>
     <a href="#updates">更新日志</a>
@@ -113,12 +115,12 @@ footer .cp{margin-top:10px;color:hsla(0,0%,100%,.6)}
   <div class="banner__inner"></div>
   <div class="banner__bd">
     <div class="banner__logo">彬煤答题助手</div>
-
+    <!-- 更新日志（仅版本号，紧凑） -->
     <div class="banner__update-log">
       <ul>
-        <li><a class="banner__update-content">彬煤答题助手 1.14.4 for Windows：官网地址迁移至 bmzs</a><span class="banner__updata-time">09-19</span></li>
-        <li><a class="banner__update-content">HarmonyOS 原生应用开放源码</a><span class="banner__updata-time">09-18</span></li>
-        <li><a class="banner__update-content">微信 8.0.78 同款界面主题全面上线</a><span class="banner__updata-time">09-18</span></li>
+        <li><a class="banner__update-content">Windows 1.15.1</a><span class="banner__updata-time">09-19</span></li>
+        <li><a class="banner__update-content">Android 1.7.5</a><span class="banner__updata-time">09-18</span></li>
+        <li><a class="banner__update-content">HarmonyOS 1.0.0</a><span class="banner__updata-time">09-18</span></li>
       </ul>
       <a class="banner__update-more" href="#updates">更多日志</a>
     </div>
@@ -167,10 +169,10 @@ footer .cp{margin-top:10px;color:hsla(0,0%,100%,.6)}
         <div><h3>Windows 电脑端</h3><p>独立窗口程序 · 支持安装与便携</p></div>
       </div>
       <div class="bd">
-        <p class="ver">最新版本 <b>v1.14.4</b> · 大小 9 MB · 微信字体样式</p>
+        <p class="ver">最新版本 <b>v1.15.1</b> · 大小 9 MB · 微信字体样式</p>
         <a class="dl-btn" href="https://github.com/qinlong9518/bmzs/releases/latest/download/binmei-web.exe">
           <svg viewBox="0 0 24 24" fill="#FFF"><path d="M12 3v10.6l3.3-3.3 1.4 1.4L12 16.4l-4.7-4.7 1.4-1.4 3.3 3.3V3h0zM5 19h14v2H5z"/></svg>
-          下载 1.14.4 (64位)
+          下载 1.15.1 (64位)
         </a>
         <a class="dl-mirror" href="https://ghfast.top/https://github.com/qinlong9518/bmzs/releases/latest/download/binmei-web.exe">国内镜像加速下载</a>
         <p class="dl-note">适用于 Windows 10 及以上版本</p>
@@ -216,7 +218,8 @@ footer .cp{margin-top:10px;color:hsla(0,0%,100%,.6)}
 <section class="updates" id="updates">
   <h2>更新日志</h2>
   <ul>
-    <li><span class="t">彬煤答题助手 1.14.4 for Windows：仓库更名 bmzs，全地址同步迁移</span><span class="d">09-19</span></li>
+    <li><span class="t">彬煤答题助手 1.15.1 for Windows：修复积分显示与启动按钮</span><span class="d">09-19</span></li>
+    <li><span class="t">彬煤答题助手 1.15.0 for Windows：重复下载自动覆盖安装、界面细节优化</span><span class="d">09-19</span></li>
     <li><span class="t">彬煤答题助手 1.14.3 for Windows：更新自动覆盖安装、积分自动加载、账号退出登录</span><span class="d">09-19</span></li>
     <li><span class="t">彬煤答题助手 1.14.2 for Windows：主窗口固定高度不出滚动条，日志区内滚动</span><span class="d">09-19</span></li>
     <li><span class="t">彬煤答题助手 1.14.1 for Windows：根治按钮失效问题（绑定名不匹配）</span><span class="d">09-19</span></li>
