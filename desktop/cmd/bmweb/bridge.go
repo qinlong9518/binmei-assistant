@@ -287,6 +287,11 @@ func (b *UIBridge) DoUpdate() {
 	}()
 }
 
+// GetPendingUpdate 前端加载后主动查询待提醒的更新（防止事件早于监听注册丢失）
+func (b *UIBridge) GetPendingUpdate() string {
+	return pendingUpdate
+}
+
 // OpenSite 打开官网
 func (b *UIBridge) OpenSite() {
 	openURL(OfficialSite)
