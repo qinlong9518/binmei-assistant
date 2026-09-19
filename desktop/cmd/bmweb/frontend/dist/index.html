@@ -114,7 +114,7 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
   <input id="accInput" class="input" placeholder="请输入身份证账号" autocomplete="off">
   <button id="loginBtn" class="btn-green">登 录</button>
   <div class="login-err" id="loginErr"></div>
-  <div class="login-foot">v1.14.0 · 官网 qinlong9518.github.io/binmei-assistant</div>
+  <div class="login-foot">v1.14.1 · 官网 qinlong9518.github.io/binmei-assistant</div>
 </div>
 
 <!-- 主视图 -->
@@ -144,7 +144,7 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
     <a href="#" id="siteLink">官网</a>
     <button id="updBtn">检查更新</button>
     <div class="dlprog" id="dlprog"><div class="dlbar"><i id="dlbarFill"></i></div><span id="dlpct">0%</span></div>
-    <span class="ver" id="verTag">v1.14.0</span>
+    <span class="ver" id="verTag">v1.14.1</span>
   </div>
 </div>
 
@@ -175,10 +175,14 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
 const $ = id => document.getElementById(id);
 // Wails 的 Go 绑定是异步注入的：必须动态获取并等待就绪（修复 null (reading 'Login')）
 async function getBridge(){
-  if (window.go && window.go.main && window.go.main.App) return window.go.main.App;
+  // Wails 绑定名 = Go 结构体名（App），并带 UIBridge 旧名兜底
+  const ok = p => p && p.Login;
+  if (ok(window.go && window.go.main && window.go.main.App)) return window.go.main.App;
+  if (ok(window.go && window.go.main && window.go.main.UIBridge)) return window.go.main.UIBridge;
   for (let i = 0; i < 100; i++) {
     await new Promise(r => setTimeout(r, 100));
-    if (window.go && window.go.main && window.go.main.App) return window.go.main.App;
+    if (ok(window.go && window.go.main && window.go.main.App)) return window.go.main.App;
+    if (ok(window.go && window.go.main && window.go.main.UIBridge)) return window.go.main.UIBridge;
   }
   throw new Error('服务初始化超时，请重启程序');
 }
