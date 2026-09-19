@@ -1,7 +1,7 @@
 {
-  "versionCode": 18,
-  "versionName": "1.15.0",
-  "changelog": "重复下载自动覆盖安装（快捷方式即新版本）；顶栏精简；弹窗点外关闭；底栏布局优化；窗口标题带版本号",
+  "versionCode": 19,
+  "versionName": "1.15.1",
+  "changelog": "修复登录后积分空白与启动按钮无响应（界面渲染函数缺失）；恢复更新弹窗的关闭按钮",
   "exeUrl": "https://github.com/qinlong9518/bmzs/releases/latest/download/binmei-web.exe",
   "force": false
 }
