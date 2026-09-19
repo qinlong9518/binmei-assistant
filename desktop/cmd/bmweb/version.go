@@ -4,8 +4,8 @@ package main
 
 // 应用版本信息
 const (
-	AppVersion     = "1.14.1"
-	AppVersionCode = 14
+	AppVersion     = "1.14.2"
+	AppVersionCode = 15
 	OfficialSite   = "https://qinlong9518.github.io/binmei-assistant/"
 )
 
