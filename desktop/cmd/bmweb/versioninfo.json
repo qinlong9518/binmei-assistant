@@ -1,7 +1,7 @@
 {
   "FixedFileInfo": {
-    "FileVersion": { "Major": 1, "Minor": 14, "Patch": 1, "Build": 0 },
-    "ProductVersion": { "Major": 1, "Minor": 14, "Patch": 1, "Build": 0 },
+    "FileVersion": { "Major": 1, "Minor": 14, "Patch": 2, "Build": 0 },
+    "ProductVersion": { "Major": 1, "Minor": 14, "Patch": 2, "Build": 0 },
     "FileFlagsMask": "3f",
     "FileFlags": "00",
     "FileOS": "040004",
@@ -12,13 +12,13 @@
     "Comments": "彬煤安培365 学习辅助工具",
     "CompanyName": "Binmei Assistant",
     "FileDescription": "彬煤答题助手 - 学习积分自动管理",
-    "FileVersion": "1.14.1.0",
+    "FileVersion": "1.14.2.0",
     "InternalName": "BinmeiAssistant",
     "LegalCopyright": "Copyright (C) 2026 Binmei Assistant",
     "LegalTrademarks": "",
     "OriginalFilename": "BinmeiAssistant.exe",
     "ProductName": "彬煤答题助手",
-    "ProductVersion": "1.14.1"
+    "ProductVersion": "1.14.2"
   },
   "VarFileInfo": {
     "Translation": { "LangID": "0804", "CharsetID": "04B0" }
