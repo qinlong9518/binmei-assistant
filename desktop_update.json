@@ -1,7 +1,7 @@
 {
-  "versionCode": 19,
-  "versionName": "1.15.1",
-  "changelog": "修复登录后积分空白与启动按钮无响应（界面渲染函数缺失）；恢复更新弹窗的关闭按钮",
+  "versionCode": 20,
+  "versionName": "1.16.0",
+  "changelog": "全应用更名彬煤助手；窗口栏标题显示版本号；退出登录后可快速切换已登录过的账号；修复手动登录不记忆的问题",
   "exeUrl": "https://github.com/qinlong9518/bmzs/releases/latest/download/binmei-web.exe",
   "force": false
 }
