@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>彬煤答题助手 - 官方下载</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%2307C160'/%3E%3Cpath d='M18 33l10 10 18-22' stroke='%23FFF' stroke-width='7' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="alternate icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%2307C160'/%3E%3Cpath d='M18 33l10 10 18-22' stroke='%23FFF' stroke-width='7' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%2307C160'/%3E%3Cpath d='M18 33l10 10 18-22' stroke='%23FFF' stroke-width='7' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
 *{margin:0;padding:0}
 body{font-family:"WeChat Sans Std","WeChat Sans",-apple-system,BlinkMacSystemFont,"Helvetica Neue","Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei UI","Microsoft YaHei",Arial,sans-serif;color:rgba(0,0,0,.9);line-height:1.4;overflow-x:hidden}
@@ -15,7 +18,7 @@ ul{list-style:none}
 .logo{align-items:center;display:flex;gap:8px;color:#fff;font-size:17px;font-weight:700;white-space:nowrap}
 .logo svg{width:26px;height:26px;flex:none}
 .head-links{margin-left:auto;display:flex;gap:22px;align-items:center}
-.head-links a{color:hsla(0,0%,100%,.9);font-size:14px;white-space:nowrap}
+.head-links a{color:hsla(0,0%,100%,.9);font-size:16px;white-space:nowrap}
 .head-links a:hover{color:#fff}
 /* 手机端：只保留更新日志，隐藏下载/GitHub（放不下会跨行） */
 @media (max-width:640px){
@@ -26,28 +29,28 @@ ul{list-style:none}
 .banner{color:hsla(0,0%,100%,.9);overflow:hidden;padding:152px 0 112px;position:relative}
 .banner__inner{background-color:#2aae67;border-radius:0 0 50% 50%;bottom:0;content:"";display:block;height:100%;left:50%;min-width:1440px;overflow:hidden;position:absolute;transform:translateX(-50%);width:150%;z-index:-1}
 .banner__bd{align-items:center;animation:show 1.3s both;display:flex;flex-direction:column;position:relative;z-index:1}
-.banner__logo{height:56px;width:100%;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:800;color:#fff;white-space:nowrap;padding:0 16px;letter-spacing:2px;font-family:"WeChat Sans Std","WeChat Sans","PingFang SC","Microsoft YaHei","Source Han Sans SC",sans-serif}
+.banner__logo{height:72px;width:100%;display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:400;color:#fff;white-space:nowrap;padding:0 16px;letter-spacing:3px;font-family:"WeChat Sans Std","WeChat Sans","PingFang SC","Microsoft YaHei","Source Han Sans SC",sans-serif}
 
 /* 更新日志 */
 .banner__update-log{padding:24px 0 0;position:relative;width:min(500px,88%)}
 .banner__update-log:before{border-top:1px solid hsla(0,0%,100%,.3);content:"";display:block;left:0;position:absolute;top:0;transform:scaleY(.5);transform-origin:left top;width:100%}
 .banner__update-log li{display:flex;margin-bottom:10px}
 .banner__update-log li:last-child{margin-bottom:0}
-.banner__update-log a{color:hsla(0,0%,100%,.9);font-size:15px;cursor:default}
+.banner__update-log a{color:hsla(0,0%,100%,.9);font-size:17px;cursor:default}
 .banner__update-content{align-items:center;display:flex;flex:1;line-height:1.4;overflow:hidden}
-.banner__updata-time{color:hsla(0,0%,100%,.7);font-variant-numeric:tabular-nums;margin-left:16px;font-size:14px}
-.banner__update-more{color:hsla(0,0%,100%,.9);display:inline-block;margin-top:16px;font-size:14px}
+.banner__updata-time{color:hsla(0,0%,100%,.7);font-variant-numeric:tabular-nums;margin-left:16px;font-size:16px}
+.banner__update-more{color:hsla(0,0%,100%,.9);display:inline-block;margin-top:16px;font-size:16px}
 .banner__update-more:after{content:">";display:inline-block;margin-left:5px}
 
 /* 圆形平台下载按钮（微信式：flex 居中，自动换行也居中） */
 .banner__download{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;column-gap:24px;row-gap:24px;margin-top:72px;padding:0 12px}
-.banner__download-item{align-items:center;background-color:hsla(0,0%,100%,.07);border-radius:50%;color:hsla(0,0%,100%,.9);cursor:pointer;display:flex;flex-direction:column;font-size:14px;height:120px;width:120px;justify-content:center;transition:background-color .5s;flex:none}
+.banner__download-item{align-items:center;background-color:hsla(0,0%,100%,.07);border-radius:50%;color:hsla(0,0%,100%,.9);cursor:pointer;display:flex;flex-direction:column;font-size:16px;height:120px;width:120px;justify-content:center;transition:background-color .5s;flex:none}
 .banner__download-item i{margin-bottom:6px;display:block}
 .banner__download-item i svg{width:40px;height:40px}
 .banner__download-item span{line-height:1.4;margin:0 10px;text-align:center}
 .banner__download-item:hover{background-color:hsla(0,0%,100%,.18)}
 @media (max-width:1024px){.banner__download-item{font-size:13px;height:112px;width:112px}}
-@media (max-width:560px){.banner{padding:120px 0 90px}.banner__logo{font-size:30px;letter-spacing:1px}.banner__download{column-gap:20px;row-gap:16px;margin-top:48px;padding:0 8px}.banner__download-item{height:96px;width:96px;font-size:12px}.banner__download-item i svg{width:32px;height:32px}.banner__download-item i{margin-bottom:4px}}
+@media (max-width:560px){.banner{padding:120px 0 90px}.banner__logo{font-size:30px;letter-spacing:1px}.banner__update-log a{font-size:15px}.banner__updata-time{font-size:14px}.banner__update-more{font-size:14px}.banner__download{column-gap:20px;row-gap:16px;margin-top:48px;padding:0 8px}.banner__download-item{height:96px;width:96px;font-size:12px}.banner__download-item i svg{width:32px;height:32px}.banner__download-item i{margin-bottom:4px}}
 
 /* 向下箭头动画 */
 .banner__arrow{animation:arrow 1s 1s infinite;background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23FFF' opacity='.2'/%3E%3Cpath fill='%23FFF' d='M11.3 15.7a1 1 0 0 0 1.4 0l4-4a1 1 0 0 0-1.4-1.4l-3.3 3.29-3.3-3.3a1 1 0 1 0-1.4 1.42l4 4z'/%3E%3C/g%3E%3C/svg%3E");background-size:cover;display:block;height:24px;left:50%;margin-left:-12px;margin-top:56px;position:absolute;width:24px;bottom:24px}
