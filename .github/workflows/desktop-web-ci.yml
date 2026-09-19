@@ -31,7 +31,7 @@ jobs:
         run: |
           go run github.com/akavel/rsrc@v0.10.2 -ico cmd/bmweb/app.ico -manifest cmd/bmweb/app.manifest -arch amd64 -o cmd/bmweb/rsrc_windows_amd64.syso
           go run github.com/josephspurrier/goversioninfo/cmd/goversioninfo@v1.4.0 -platform-specific -o cmd/bmweb/rsrc_version_windows_amd64.syso cmd/bmweb/versioninfo.json
-          go build -v -trimpath -ldflags "-s -w -H windowsgui" -o binmei-web.exe ./cmd/bmweb
+          go build -v -trimpath -tags "desktop,production" -ldflags "-s -w -H windowsgui" -o binmei-web.exe ./cmd/bmweb
       - name: Smoke test
         shell: pwsh
         run: |
@@ -45,6 +45,17 @@ jobs:
             }
             exit 1
           } else {
+            $p.Refresh()
+            $title = $p.MainWindowTitle
+            Write-Host "MainWindowTitle: $title"
+            if ($title -eq 'Error' -or $title -like '*not build*') {
+              Write-Host "::error::Wails error dialog detected (missing build tags?)"
+              Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
+              exit 1
+            }
+            if ($title -ne [string]::Empty -and $title -notlike '*彬煤答题助手*') {
+              Write-Host "::warning::unexpected window title"
+            }
             Write-Host "WINDOW OK - process alive PID=$($p.Id)"
             $v = (Get-Item ".\binmei-web.exe").VersionInfo
             Write-Host "ProductName=$($v.ProductName) FileVersion=$($v.FileVersion)"
