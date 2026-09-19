@@ -1,7 +1,7 @@
 {
-  "versionCode": 9,
-  "versionName": "1.13.0",
-  "changelog": "全新 Wails 现代界面：微信绿渐变、圆角积分卡、流畅动效；功能不变，包体更小",
+  "versionCode": 10,
+  "versionName": "1.13.1",
+  "changelog": "修复启动报错问题（构建标签缺失），界面与功能不变",
   "exeUrl": "https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-web.exe",
   "force": false
 }
