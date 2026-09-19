@@ -19,8 +19,8 @@ ul{list-style:none}
 .logo{align-items:center;display:flex;gap:8px;color:#fff;font-size:17px;font-weight:700;white-space:nowrap}
 .logo svg{width:26px;height:26px;flex:none}
 .head-links{margin-left:auto;display:flex;gap:0;align-items:center}
-.head-links a{color:hsla(0,0%,100%,.9);font-size:16px;white-space:nowrap;padding:0 18px}
-.head-links a:not(:last-child):after{content:"｜";margin-left:36px;color:hsla(0,0%,100%,.5)}
+.head-links a{color:hsla(0,0%,100%,.9);font-size:16px;white-space:nowrap;padding:0 9px}
+.head-links a:not(:last-child):after{content:"｜";margin-left:18px;color:hsla(0,0%,100%,.5)}
 .head-links a:hover{color:#fff}
 /* 手机端：只保留更新日志，隐藏下载/GitHub（放不下会跨行） */
 @media (max-width:640px){
@@ -28,7 +28,7 @@ ul{list-style:none}
 }
 
 /* ===== Banner（绿色大区块 + 底部圆弧） ===== */
-.banner{color:hsla(0,0%,100%,.9);overflow:hidden;padding:179px 0 112px;position:relative}
+.banner{color:hsla(0,0%,100%,.9);overflow:hidden;padding:150px 0 112px;position:relative}
 .banner__inner{background-color:#2aae67;border-radius:0 0 50% 50%;bottom:0;content:"";display:block;height:100%;left:50%;min-width:1440px;overflow:hidden;position:absolute;transform:translateX(-50%);width:150%;z-index:-1}
 .banner__bd{align-items:center;animation:show 1.3s both;display:flex;flex-direction:column;position:relative;z-index:1}
 .banner__logo{height:72px;margin-bottom:40px;width:100%;display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:400;color:#fff;white-space:nowrap;padding:0 16px;letter-spacing:3px;font-family:"WeChat Sans Std","WeChat Sans","PingFang SC","Microsoft YaHei","Source Han Sans SC",sans-serif}
@@ -41,8 +41,6 @@ ul{list-style:none}
 .banner__update-log a{color:hsla(0,0%,100%,.9);font-size:21px;cursor:default}
 .banner__update-content{align-items:center;display:flex;flex:1;line-height:1.5;overflow:hidden}
 .banner__updata-time{color:hsla(0,0%,100%,.7);font-variant-numeric:tabular-nums;margin-left:16px;font-size:21px}
-.banner__update-more{color:hsla(0,0%,100%,.9);display:inline-block;margin-top:20px;font-size:18px}
-.banner__update-more:after{content:">";display:inline-block;margin-left:5px}
 
 /* 圆形平台下载按钮（微信式：flex 居中，自动换行也居中） */
 .banner__download{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;column-gap:24px;row-gap:24px;margin-top:72px;padding:0 12px}
@@ -52,7 +50,7 @@ ul{list-style:none}
 .banner__download-item span{line-height:1.4;margin:0 10px;text-align:center}
 .banner__download-item:hover{background-color:hsla(0,0%,100%,.18)}
 @media (max-width:1024px){.banner__download-item{font-size:13px;height:112px;width:112px}}
-@media (max-width:560px){.banner{padding:60px 0 45px}.banner__logo{font-size:30px;letter-spacing:1px}.banner__update-log a{font-size:15px}.banner__updata-time{font-size:14px}.banner__update-more{font-size:14px}.banner__download{column-gap:20px;row-gap:16px;margin-top:48px;padding:0 8px}.banner__download-item{height:96px;width:96px;font-size:12px}.banner__download-item i svg{width:32px;height:32px}.banner__download-item i{margin-bottom:4px}}
+@media (max-width:560px){.banner{padding:30px 0 22px}.banner__logo{font-size:30px;letter-spacing:1px}.banner__update-log a{font-size:15px}.banner__updata-time{font-size:14px}.banner__download{column-gap:20px;row-gap:16px;margin-top:48px;padding:0 8px}.banner__download-item{height:96px;width:96px;font-size:12px}.banner__download-item i svg{width:32px;height:32px}.banner__download-item i{margin-bottom:4px}}
 
 @keyframes arrow{0%{transform:translateY(0)}50%{transform:translateY(8px)}100%{transform:translateY(0)}}
 @keyframes show{0%{opacity:0;transform:translateY(30px)}100%{opacity:1;transform:none}}
@@ -104,7 +102,7 @@ footer .cp{margin-top:10px;color:hsla(0,0%,100%,.6)}
 <header class="head">
   <div style="flex:1"></div>
   <div class="head-links">
-    <a href="#download">下载</a>
+    <a href="#download">立即下载</a>
     <a href="#updates">更新日志</a>
     <a href="https://github.com/qinlong9518/bmzs" target="_blank">GitHub</a>
   </div>
@@ -122,7 +120,6 @@ footer .cp{margin-top:10px;color:hsla(0,0%,100%,.6)}
         <li><a class="banner__update-content">彬煤助手 1.7.5 for Android 全新发布</a><span class="banner__updata-time">09-18</span></li>
         <li><a class="banner__update-content">彬煤助手 1.0.0 for HarmonyOS 全新发布</a><span class="banner__updata-time">09-18</span></li>
       </ul>
-      <a class="banner__update-more" href="#updates">更多日志</a>
     </div>
 
     <div class="banner__download">
