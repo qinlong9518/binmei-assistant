@@ -1,7 +1,7 @@
 {
-  "versionCode": 3,
-  "versionName": "1.9.1",
-  "changelog": "修复双击无反应：嵌入系统清单，新增崩溃日志 bm_crash.log/bm_debug.log",
-  "exeUrl": "https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-desktop.exe",
+  "versionCode": 9,
+  "versionName": "1.13.0",
+  "changelog": "全新 Wails 现代界面：微信绿渐变、圆角积分卡、流畅动效；功能不变，包体更小",
+  "exeUrl": "https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-web.exe",
   "force": false
 }
