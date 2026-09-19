@@ -12,7 +12,7 @@ ul{list-style:none}
 
 /* ===== 顶部导航（绿色横条，微信式） ===== */
 .head{align-items:center;background-color:#2aae67;box-sizing:border-box;display:flex;padding:0 20px;position:fixed;top:0;width:100%;height:54px;z-index:100}
-.logo{align-items:center;display:flex;gap:8px;color:#fff;font-size:16px;font-weight:600;white-space:nowrap}
+.logo{align-items:center;display:flex;gap:8px;color:#fff;font-size:17px;font-weight:700;white-space:nowrap}
 .logo svg{width:26px;height:26px;flex:none}
 .head-links{margin-left:auto;display:flex;gap:22px;align-items:center}
 .head-links a{color:hsla(0,0%,100%,.9);font-size:14px;white-space:nowrap}
@@ -26,7 +26,7 @@ ul{list-style:none}
 .banner{color:hsla(0,0%,100%,.9);overflow:hidden;padding:152px 0 112px;position:relative}
 .banner__inner{background-color:#2aae67;border-radius:0 0 50% 50%;bottom:0;content:"";display:block;height:100%;left:50%;min-width:1440px;overflow:hidden;position:absolute;transform:translateX(-50%);width:150%;z-index:-1}
 .banner__bd{align-items:center;animation:show 1.3s both;display:flex;flex-direction:column;position:relative;z-index:1}
-.banner__logo{height:56px;width:100%;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;color:#fff;white-space:nowrap;padding:0 16px}
+.banner__logo{height:56px;width:100%;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:#fff;white-space:nowrap;padding:0 16px;letter-spacing:2px;font-family:"PingFang SC","Microsoft YaHei","Source Han Sans SC",sans-serif}
 
 /* 更新日志 */
 .banner__update-log{padding:24px 0 0;position:relative;width:min(500px,88%)}
@@ -164,10 +164,10 @@ footer .cp{margin-top:10px;color:hsla(0,0%,100%,.6)}
         <div><h3>Windows 电脑端</h3><p>独立窗口程序 · 支持安装与便携</p></div>
       </div>
       <div class="bd">
-        <p class="ver">最新版本 <b>v1.14.1</b> · 大小 9 MB · 自动更新提醒</p>
+        <p class="ver">最新版本 <b>v1.14.2</b> · 大小 9 MB · 界面布局优化</p>
         <a class="dl-btn" href="https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-web.exe">
           <svg viewBox="0 0 24 24" fill="#FFF"><path d="M12 3v10.6l3.3-3.3 1.4 1.4L12 16.4l-4.7-4.7 1.4-1.4 3.3 3.3V3h0zM5 19h14v2H5z"/></svg>
-          下载 1.14.1 (64位)
+          下载 1.14.2 (64位)
         </a>
         <a class="dl-mirror" href="https://ghfast.top/https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-web.exe">国内镜像加速下载</a>
         <p class="dl-note">适用于 Windows 10 及以上版本</p>
@@ -213,6 +213,7 @@ footer .cp{margin-top:10px;color:hsla(0,0%,100%,.6)}
 <section class="updates" id="updates">
   <h2>更新日志</h2>
   <ul>
+    <li><span class="t">彬煤答题助手 1.14.2 for Windows：主窗口固定高度不出滚动条，日志区内滚动</span><span class="d">09-19</span></li>
     <li><span class="t">彬煤答题助手 1.14.1 for Windows：根治按钮失效问题（绑定名不匹配）</span><span class="d">09-19</span></li>
     <li><span class="t">彬煤答题助手 1.14.0 for Windows：新版本自动弹窗提醒，无需手动检查</span><span class="d">09-19</span></li>
     <li><span class="t">彬煤答题助手 1.13.3 for Windows：修复登录按钮报错</span><span class="d">09-19</span></li>
@@ -237,5 +238,10 @@ footer .cp{margin-top:10px;color:hsla(0,0%,100%,.6)}
   <div class="cp">本工具仅供学习交流使用 · © 2026 彬煤答题助手</div>
 </footer>
 
+    <script>
+    /* 强制从页面顶部加载（浏览器滚动位置恢复会导致刷新后停在页面中部） */
+    if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
+    window.addEventListener('load', function(){ window.scrollTo(0, 0); });
+    </script>
 </body>
 </html>
