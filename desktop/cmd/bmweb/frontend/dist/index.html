@@ -114,7 +114,7 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
   <input id="accInput" class="input" placeholder="请输入身份证账号" autocomplete="off">
   <button id="loginBtn" class="btn-green">登 录</button>
   <div class="login-err" id="loginErr"></div>
-  <div class="login-foot">v1.13.3 · 官网 qinlong9518.github.io/binmei-assistant</div>
+  <div class="login-foot">v1.14.0 · 官网 qinlong9518.github.io/binmei-assistant</div>
 </div>
 
 <!-- 主视图 -->
@@ -144,7 +144,7 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
     <a href="#" id="siteLink">官网</a>
     <button id="updBtn">检查更新</button>
     <div class="dlprog" id="dlprog"><div class="dlbar"><i id="dlbarFill"></i></div><span id="dlpct">0%</span></div>
-    <span class="ver" id="verTag">v1.13.3</span>
+    <span class="ver" id="verTag">v1.14.0</span>
   </div>
 </div>
 
@@ -289,15 +289,28 @@ function sig(pts){ return pts.map(p=>p.name+p.cur).join('|'); }
 if(window.runtime){
   window.runtime.EventsOn('state', s => renderState(s));
   window.runtime.EventsOn('toast', m => toast(m));
-  window.runtime.EventsOn('updateAvailable', info => {
-    $('updBody').textContent = '新版本 '+info.split('\n')[0]+'\n\n'+info.split('\n').slice(1).join('\n').trim();
-    $('updMask').classList.add('on');
-  });
+  window.runtime.EventsOn('updateAvailable', info => showUpd(info));
   window.runtime.EventsOn('dlProgress', p => {
     $('dlbarFill').style.width = p+'%'; $('dlpct').textContent = p+'%';
     if(p>=100) setTimeout(()=>{ $('dlprog').classList.remove('on'); $('dlbarFill').style.width='0%'; }, 1200);
   });
 }
+
+/* 更新弹窗（自动提醒 + 手动检查共用） */
+function showUpd(info){
+  const lines = info.split('\n');
+  $('updBody').textContent = '新版本 '+lines[0]+'\n\n'+lines.slice(1).join('\n').trim();
+  $('updMask').classList.add('on');
+}
+
+/* 启动后主动查一次待提醒（后端 5 秒首查可能早于前端监听注册，双保险） */
+(async () => {
+  try{
+    const b = await getBridge();
+    const p = await b.GetPendingUpdate();
+    if(p) showUpd(p);
+  }catch(e){}
+})();
 
 /* 启动：先显示登录视图占位，等第一帧状态 */
 showLogin();
