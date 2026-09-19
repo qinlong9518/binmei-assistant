@@ -1,7 +1,7 @@
 {
-  "versionCode": 8,
-  "versionName": "1.12.0",
-  "changelog": "积分面板美化：渐变顶栏 + 圆角积分卡片（GDI 自绘）",
+  "versionCode": 3,
+  "versionName": "1.9.1",
+  "changelog": "修复双击无反应：嵌入系统清单，新增崩溃日志 bm_crash.log/bm_debug.log",
   "exeUrl": "https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-desktop.exe",
   "force": false
 }
