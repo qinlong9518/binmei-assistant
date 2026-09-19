@@ -4,16 +4,16 @@ package main
 
 // 应用版本信息
 const (
-	AppVersion     = "1.14.3"
-	AppVersionCode = 16
-	OfficialSite   = "https://qinlong9518.github.io/binmei-assistant/"
+	AppVersion     = "1.14.4"
+	AppVersionCode = 17
+	OfficialSite   = "https://qinlong9518.github.io/bmzs/"
 )
 
 // 在线更新元数据源（镜像优先）
 var metaSources = []string{
-	"https://ghfast.top/https://raw.githubusercontent.com/qinlong9518/binmei-assistant/main/desktop_update.json",
-	"https://ghproxy.net/https://raw.githubusercontent.com/qinlong9518/binmei-assistant/main/desktop_update.json",
-	"https://raw.githubusercontent.com/qinlong9518/binmei-assistant/main/desktop_update.json",
+	"https://ghfast.top/https://raw.githubusercontent.com/qinlong9518/bmzs/main/desktop_update.json",
+	"https://ghproxy.net/https://raw.githubusercontent.com/qinlong9518/bmzs/main/desktop_update.json",
+	"https://raw.githubusercontent.com/qinlong9518/bmzs/main/desktop_update.json",
 }
 
 // downloadMirrors GitHub 直链镜像前缀
