@@ -1,6 +1,6 @@
 //go:build windows
 
-// 彬煤答题助手 v1.13.0 —— Wails 版（HTML/CSS 界面 + WebView2 渲染）
+// 彬煤助手 v1.13.0 —— Wails 版（HTML/CSS 界面 + WebView2 渲染）
 // 业务逻辑与 walk 版（cmd/bmwin）完全同源：
 //   - 配置/账号管理：config.go
 //   - 自动答题引擎：engine.go
@@ -49,7 +49,7 @@ func main() {
 	bridge := NewBridge()
 
 	err := wails.Run(&options.App{
-		Title:     "彬煤答题助手",
+		Title:     "彬煤助手",
 		Width:     400,
 		Height:    650,
 		MinWidth:  360,
