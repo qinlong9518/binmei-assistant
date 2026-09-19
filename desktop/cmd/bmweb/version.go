@@ -4,8 +4,8 @@ package main
 
 // 应用版本信息
 const (
-	AppVersion     = "1.16.0"
-	AppVersionCode = 20
+	AppVersion     = "1.16.1"
+	AppVersionCode = 21
 	OfficialSite   = "https://qinlong9518.github.io/bmzs/"
 )
 
