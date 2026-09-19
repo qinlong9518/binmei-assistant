@@ -97,8 +97,16 @@ func ensureInstalledFlow() bool {
 	if isInstalled() {
 		return true
 	}
-	// 安装目录已有旧版本 → 视为升级场景
+	// 安装目录已有旧版本 → 自动升级：覆盖安装并从安装目录重启
 	if _, err := os.Stat(installedExePath()); err == nil {
+		exe, err := os.Executable()
+		if err == nil && filepath.Dir(exe) != installDir() {
+			// 从下载目录/其他位置运行 → 覆盖安装目录的程序
+			if err := installFrom(exe); err == nil {
+				startExe(installedExePath())
+				os.Exit(0)
+			}
+		}
 		return true
 	}
 	if !sysMsgBox("安装",
