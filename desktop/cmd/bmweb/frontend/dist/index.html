@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>彬煤答题助手</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none}
+html,body{height:100%;overflow:hidden}
+body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;background:#F3F6F4;display:flex;flex-direction:column}
+
+/* ===== 顶栏：微信绿渐变 ===== */
+.topbar{flex:none;background:linear-gradient(135deg,#07C160,#06AD56);color:#fff;padding:14px 16px 12px;
+  box-shadow:0 2px 8px rgba(7,193,96,.25)}
+.topbar-row{display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:16px;font-weight:700;letter-spacing:.5px}
+.brand small{display:block;font-size:11px;font-weight:400;opacity:.85;margin-top:2px;letter-spacing:0}
+.user-chip{background:rgba(255,255,255,.18);border:none;color:#fff;font-size:12px;padding:6px 12px;
+  border-radius:20px;cursor:pointer;font-family:inherit;transition:.15s}
+.user-chip:hover{background:rgba(255,255,255,.3)}
+.user-chip:disabled{opacity:.6;cursor:default}
+
+/* ===== 主体 ===== */
+.main{flex:1;overflow-y:auto;padding:14px 14px 8px;-webkit-user-select:text;user-select:text}
+
+/* 积分卡 3×2 */
+.points{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px}
+.pt{background:#fff;border-radius:14px;padding:12px 6px 10px;text-align:center;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);border:1px solid #EDF2EE}
+.pt .n{font-size:11px;color:#8a9691;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pt .v{font-size:17px;font-weight:700;color:#07C160}
+.pt.miss .v{color:#E6503C}
+.pt.pending .v{color:#C3CCC7;font-size:13px;padding-top:3px}
+
+/* 状态卡 */
+.card{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.05);border:1px solid #EDF2EE}
+.task-row{display:flex;align-items:center;gap:10px}
+.task-dot{width:9px;height:9px;border-radius:50%;background:#C3CCC7;flex:none}
+.task-dot.on{background:#07C160;box-shadow:0 0 0 3px rgba(7,193,96,.15)}
+.task-txt{flex:1;font-size:13px;color:#3d4a44;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-main{flex:none;border:none;border-radius:20px;padding:8px 22px;font-size:13px;font-weight:700;
+  color:#fff;cursor:pointer;font-family:inherit;transition:.15s}
+.btn-start{background:linear-gradient(135deg,#07C160,#06AD56);box-shadow:0 2px 6px rgba(7,193,96,.35)}
+.btn-start:hover{filter:brightness(1.06)}
+.btn-stop{background:#fff;color:#E6503C;border:1px solid #E6503C}
+.hint{font-size:11px;color:#9aa5a0;margin-top:8px;line-height:1.6}
+
+/* 日志卡 */
+.card-title{font-size:12px;color:#8a9691;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.logbox{background:#0F1A14;border-radius:10px;padding:10px 12px;height:190px;overflow-y:auto;
+  font-family:Consolas,monospace;font-size:11px;line-height:1.75;color:#9fd8b4;white-space:pre-wrap;word-break:break-all}
+
+/* ===== 底部状态栏 ===== */
+.foot{flex:none;display:flex;align-items:center;gap:14px;padding:9px 14px;border-top:1px solid #E4EAE6;background:#FAFCFB}
+.foot a,.foot button{font-size:12px;color:#5a6762;background:none;border:none;cursor:pointer;font-family:inherit;text-decoration:none;padding:0}
+.foot a:hover,.foot button:hover{color:#07C160}
+.dlprog{flex:1;display:none;align-items:center;gap:8px;font-size:11px;color:#5a6762}
+.dlprog.on{display:flex}
+.dlbar{flex:1;height:4px;background:#E4EAE6;border-radius:2px;overflow:hidden}
+.dlbar i{display:block;height:100%;background:#07C160;width:0%;transition:width .2s}
+.ver{margin-left:auto;font-size:11px;color:#9aa5a0}
+
+/* ===== 登录视图 ===== */
+.login-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 30px}
+.logo-circle{width:76px;height:76px;border-radius:50%;margin:0 auto 18px;
+  background:linear-gradient(135deg,#07C160,#06AD56);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 18px rgba(7,193,96,.35)}
+.logo-circle svg{width:38px;height:38px}
+.login-title{text-align:center;font-size:19px;font-weight:700;color:#22312a;margin-bottom:4px}
+.login-sub{text-align:center;font-size:12px;color:#9aa5a0;margin-bottom:26px}
+.input{width:100%;border:1.5px solid #DDE5E0;border-radius:12px;padding:12px 14px;font-size:14px;
+  outline:none;font-family:inherit;background:#fff;transition:.15s}
+.input:focus{border-color:#07C160;box-shadow:0 0 0 3px rgba(7,193,96,.12)}
+.btn-green{width:100%;border:none;border-radius:12px;padding:12px;font-size:15px;font-weight:700;color:#fff;
+  background:linear-gradient(135deg,#07C160,#06AD56);cursor:pointer;font-family:inherit;margin-top:14px;
+  box-shadow:0 3px 8px rgba(7,193,96,.3);transition:.15s}
+.btn-green:hover{filter:brightness(1.05)}
+.btn-green:disabled{opacity:.6}
+.login-err{font-size:12px;color:#E6503C;text-align:center;min-height:18px;margin-top:10px}
+.login-foot{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;color:#b0bab5}
+
+/* ===== 弹窗 ===== */
+.mask{position:fixed;inset:0;background:rgba(15,26,20,.45);display:none;align-items:center;justify-content:center;z-index:50}
+.mask.on{display:flex}
+.modal{background:#fff;border-radius:16px;width:86%;max-width:330px;padding:20px;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+.modal h3{font-size:15px;color:#22312a;margin-bottom:10px}
+.modal .body{font-size:13px;color:#4d5a54;line-height:1.7;white-space:pre-wrap;max-height:260px;overflow-y:auto;-webkit-user-select:text;user-select:text}
+.modal .acts{display:flex;gap:10px;margin-top:18px}
+.modal .acts button{flex:1;border-radius:10px;padding:9px;font-size:13px;cursor:pointer;font-family:inherit;border:none}
+.btn-ok{background:#07C160;color:#fff;font-weight:700}
+.btn-cancel{background:#F0F4F1;color:#5a6762}
+.acc-item{display:flex;align-items:center;gap:8px;padding:9px 8px;border-radius:10px;cursor:pointer;font-size:13px;color:#3d4a44}
+.acc-item:hover{background:#F0F7F2}
+.acc-item.cur{color:#07C160;font-weight:700}
+.acc-item .del{margin-left:auto;color:#c2ccc7;font-size:15px;padding:0 6px;border-radius:6px}
+.acc-item .del:hover{color:#E6503C;background:#FDF0EE}
+.acc-empty{font-size:12px;color:#9aa5a0;text-align:center;padding:14px 0}
+
+/* toast */
+#toast{position:fixed;top:20%;left:50%;transform:translateX(-50%);background:rgba(15,26,20,.82);color:#fff;
+  font-size:13px;padding:10px 18px;border-radius:10px;opacity:0;transition:.25s;pointer-events:none;z-index:99}
+#toast.on{opacity:1}
+</style>
+</head>
+<body>
+
+<!-- 登录视图 -->
+<div id="loginView" class="login-wrap" style="display:none;position:relative">
+  <div class="logo-circle">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="login-title">彬煤答题助手</div>
+  <div class="login-sub">登录后自动管理学习积分</div>
+  <input id="accInput" class="input" placeholder="请输入身份证账号" autocomplete="off">
+  <button id="loginBtn" class="btn-green">登 录</button>
+  <div class="login-err" id="loginErr"></div>
+  <div class="login-foot">v1.13.0 · 官网 qinlong9518.github.io/binmei-assistant</div>
+</div>
+
+<!-- 主视图 -->
+<div id="appView" style="display:none;flex:1;flex-direction:column;min-height:0">
+  <div class="topbar">
+    <div class="topbar-row">
+      <div class="brand">彬煤答题助手<small>自动答题 · 积分管理</small></div>
+      <button id="userChip" class="user-chip">未登录 ▾</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="points" id="points"></div>
+    <div class="card">
+      <div class="task-row">
+        <span class="task-dot" id="taskDot"></span>
+        <span class="task-txt" id="taskTxt">未启动 · 点「启动」自动补分</span>
+        <button id="runBtn" class="btn-main btn-start">启动</button>
+      </div>
+      <div class="hint">不足 24 分自动开考（优先试卷二）· 3 秒轮询 · 手机/模拟考试</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span>运行日志</span><span id="logCount"></span></div>
+      <div class="logbox" id="logbox">等待任务…</div>
+    </div>
+  </div>
+  <div class="foot">
+    <a href="#" id="siteLink">官网</a>
+    <button id="updBtn">检查更新</button>
+    <div class="dlprog" id="dlprog"><div class="dlbar"><i id="dlbarFill"></i></div><span id="dlpct">0%</span></div>
+    <span class="ver" id="verTag">v1.13.0</span>
+  </div>
+</div>
+
+<!-- 更新弹窗 -->
+<div class="mask" id="updMask">
+  <div class="modal">
+    <h3>发现新版本</h3>
+    <div class="body" id="updBody"></div>
+    <div class="acts">
+      <button class="acts-btn btn-cancel" onclick="closeUpd()">以后再说</button>
+      <button class="btn-ok" id="updOkBtn">立即更新</button>
+    </div>
+  </div>
+</div>
+
+<!-- 账号弹窗 -->
+<div class="mask" id="accMask">
+  <div class="modal">
+    <h3>账号管理</h3>
+    <div class="body" id="accList" style="max-height:220px"></div>
+    <div class="acts"><button class="btn-cancel" style="flex:1" onclick="closeAcc()">关闭</button></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const bridge = window.go && window.go.main && window.go.main.App ? window.go.main.App : null;
+
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(t._tm); t._tm = setTimeout(()=>t.classList.remove('on'), 2200);
+}
+
+/* ---- 视图切换 ---- */
+function showLogin(){ $('loginView').style.display='flex'; $('appView').style.display='none'; }
+function showApp(){ $('loginView').style.display='none'; $('appView').style.display='flex'; }
+
+/* ---- 登录 ---- */
+$('loginBtn').onclick = async () => {
+  const acc = $('accInput').value.trim();
+  if(!acc){ $('loginErr').textContent = '请输入账号'; return; }
+  const btn = $('loginBtn'); btn.disabled = true; btn.textContent = '登录中…'; $('loginErr').textContent='';
+  try{
+    const err = await bridge.Login(acc);
+    if(err){ $('loginErr').textContent = err; }
+  }catch(e){ $('loginErr').textContent = String(e); }
+  btn.disabled = false; btn.textContent = '登 录';
+};
+$('accInput').addEventListener('keydown', e => { if(e.key==='Enter') $('loginBtn').click(); });
+
+/* ---- 主界面事件 ---- */
+$('runBtn').onclick = () => bridge.ToggleRun();
+$('siteLink').onclick = e => { e.preventDefault(); bridge.OpenSite(); };
+$('updBtn').onclick = () => bridge.CheckUpdate();
+$('userChip').onclick = openAcc;
+
+function closeUpd(){ $('updMask').classList.remove('on'); }
+function closeAcc(){ $('accMask').classList.remove('on'); }
+$('updOkBtn').onclick = () => { closeUpd(); $('dlprog').classList.add('on'); bridge.DoUpdate(); };
+
+/* ---- 账号管理 ---- */
+async function openAcc(){
+  const cur = await bridge.CurrentAccount();
+  const list = await bridge.ListAccounts() || [];
+  const box = $('accList');
+  if(!list.length){ box.innerHTML = '<div class="acc-empty">暂无保存的账号</div>'; }
+  else {
+    box.innerHTML = '';
+    list.forEach(a => {
+      const div = document.createElement('div');
+      div.className = 'acc-item' + (a.id===cur ? ' cur' : '');
+      div.innerHTML = '<span>👤 '+a.name+'（'+a.id+'）</span>' + (a.id===cur?'<span style="font-size:11px">当前</span>':'<span class="del">✕</span>');
+      div.onclick = ev => {
+        if(ev.target.classList.contains('del')){
+          bridge.DeleteAccount(a.id); div.remove(); toast('已删除记录');
+        } else if(a.id!==cur){
+          bridge.SwitchAccount(a.id); closeAcc(); toast('切换中…');
+        }
+      };
+      box.appendChild(div);
+    });
+  }
+  $('accMask').classList.add('on');
+}
+
+/* ---- 状态渲染 ---- */
+function fmtPts(v){ return Number.isInteger(v) ? v : v.toFixed(1); }
+let lastLogs = '';
+function renderState(s){
+  if(s.loggedIn){
+    showApp();
+    $('userChip').textContent = '👤 '+s.name+' ▾';
+    // 积分卡
+    const el = $('points');
+    if(!s.points || !s.points.length){
+      el.innerHTML = '<div class="pt pending" style="grid-column:1/-1"><div class="v">获取积分中…</div></div>';
+    } else if(el.childElementCount !== s.points.length || el.dataset.sig !== sig(s.points)){
+      el.dataset.sig = sig(s.points);
+      el.innerHTML = s.points.map(p =>
+        '<div class="pt'+(p.full?'':' miss')+'"><div class="n">'+p.name+'</div><div class="v">'+fmtPts(p.cur)+'/'+fmtPts(p.max)+'</div></div>'
+      ).join('');
+    }
+    // 任务状态
+    $('taskDot').className = 'task-dot' + (s.running?' on':'');
+    let t;
+    if(s.running) t = s.task ? s.task : '监控中（3 秒轮询）';
+    else if(s.task) t = s.task;
+    else t = '未启动 · 点「启动」自动补分';
+    $('taskTxt').textContent = t;
+    const rb = $('runBtn');
+    if(s.running){ rb.textContent='停止'; rb.className='btn-main btn-stop'; }
+    else { rb.textContent='启动'; rb.className='btn-main btn-start'; }
+  } else {
+    showLogin();
+  }
+  // 日志
+  if(s.logs !== lastLogs){
+    lastLogs = s.logs;
+    const lb = $('logbox');
+    const stick = lb.scrollTop + lb.clientHeight >= lb.scrollHeight - 30;
+    lb.textContent = s.logs || '等待任务…';
+    if(stick) lb.scrollTop = lb.scrollHeight;
+  }
+  // 状态栏
+  if(s.status !== undefined) $('updBtn').textContent = s.status || '检查更新';
+}
+function sig(pts){ return pts.map(p=>p.name+p.cur).join('|'); }
+
+/* ---- Wails 事件 ---- */
+if(window.runtime){
+  window.runtime.EventsOn('state', s => renderState(s));
+  window.runtime.EventsOn('toast', m => toast(m));
+  window.runtime.EventsOn('updateAvailable', info => {
+    $('updBody').textContent = '新版本 '+info.split('\n')[0]+'\n\n'+info.split('\n').slice(1).join('\n').trim();
+    $('updMask').classList.add('on');
+  });
+  window.runtime.EventsOn('dlProgress', p => {
+    $('dlbarFill').style.width = p+'%'; $('dlpct').textContent = p+'%';
+    if(p>=100) setTimeout(()=>{ $('dlprog').classList.remove('on'); $('dlbarFill').style.width='0%'; }, 1200);
+  });
+}
+
+/* 启动：先显示登录视图占位，等第一帧状态 */
+showLogin();
+</script>
+</body>
+</html>
