@@ -1,7 +1,7 @@
 {
-  "versionCode": 13,
-  "versionName": "1.14.0",
-  "changelog": "新版本自动弹窗提醒（启动时+每4小时自动检查），无需手动点检查更新",
+  "versionCode": 14,
+  "versionName": "1.14.1",
+  "changelog": "修复'服务初始化超时'——绑定名与前端不匹配导致登录/按钮全部失效，已根治",
   "exeUrl": "https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-web.exe",
   "force": false
 }
