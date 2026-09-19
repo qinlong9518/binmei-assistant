@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>彬煤答题助手 v1.15.1</title>
+<title>彬煤助手 v1.16.0</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none}
 html,body{height:100%;overflow:hidden}
@@ -96,6 +96,13 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
 .acc-item .del{margin-left:auto;color:#c2ccc7;font-size:15px;padding:0 6px;border-radius:6px}
 .acc-item .del:hover{color:#E6503C;background:#FDF0EE}
 .acc-empty{font-size:12px;color:#9aa5a0;text-align:center;padding:14px 0}
+/* ---- 登录页已保存账号快捷切换 ---- */
+.saved-acc{width:100%;margin-top:14px}
+.saved-acc-t{font-size:12px;color:#8a938e;margin-bottom:6px;text-align:left}
+.saved-item{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #e4e9e5;border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:14px;color:#111;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.saved-item:hover{border-color:#2aae67;box-shadow:0 2px 8px rgba(42,174,103,.12)}
+.saved-item b{font-weight:600}
+.saved-item span{color:#8a938e;font-size:12px}
 
 /* toast */
 #toast{position:fixed;top:20%;left:50%;transform:translateX(-50%);background:rgba(15,26,20,.82);color:#fff;
@@ -110,19 +117,23 @@ body{font-family:"Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;bac
   <div class="logo-circle">
     <svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
-  <div class="login-title">彬煤答题助手</div>
+  <div class="login-title">彬煤助手</div>
   <div class="login-sub">登录后自动管理学习积分</div>
   <input id="accInput" class="input" placeholder="请输入身份证账号" autocomplete="off">
   <button id="loginBtn" class="btn-green">登 录</button>
   <div class="login-err" id="loginErr"></div>
-  <div class="login-foot">v1.15.1 · 官网 qinlong9518.github.io/bmzs</div>
+  <div class="saved-acc" id="savedAcc" style="display:none">
+    <div class="saved-acc-t">选择已登录过的账号</div>
+    <div id="savedList"></div>
+  </div>
+  <div class="login-foot">v1.16.0 · 官网 qinlong9518.github.io/bmzs</div>
 </div>
 
 <!-- 主视图 -->
 <div id="appView" style="display:none;flex:1;flex-direction:column;min-height:0">
   <div class="topbar">
     <div class="topbar-row">
-      <div class="brand">彬煤答题助手</div>
+      <div class="brand">彬煤助手</div>
       <button id="userChip" class="user-chip">未登录 ▾</button>
     </div>
   </div>
@@ -255,6 +266,25 @@ async function openAcc(){
 }
 
 /* ---- 状态渲染 ---- */
+// renderSavedList 登录页"已保存账号"快捷切换列表（点击即恢复登录）
+async function renderSavedList(){
+  const b = await getBridge();
+  const list = await b.ListAccounts() || [];
+  const box = $('savedList');
+  box.innerHTML = '';
+  for(const a of list){
+    const div = document.createElement('div');
+    div.className = 'saved-item';
+    div.innerHTML = '<b>'+a.name+'（'+a.id+'）</b><span>点击登录 ›</span>';
+    div.onclick = async () => {
+      const btn = $('loginBtn'); btn.disabled = true; btn.textContent = '登录中…';
+      try{ const err = await b.Login(a.id); if(err) $('loginErr').textContent = err; }
+      catch(e){ $('loginErr').textContent = String(e); }
+      btn.disabled = false; btn.textContent = '登 录';
+    };
+    box.appendChild(div);
+  }
+}
 function fmtPts(v){ return Number.isInteger(v) ? v : v.toFixed(1); }
 function sig(pts){ return pts.map(p=>p.name+p.cur).join('|'); }
 let lastLogs = '';
@@ -293,9 +323,18 @@ function renderState(s){
     const rb = $('runBtn');
     if(s.running){ rb.textContent='停止'; rb.className='btn-main btn-stop'; }
     else { rb.textContent='启动'; rb.className='btn-main btn-start'; }
-  } else {
-    showLogin();
-  }
+	} else {
+		showLogin();
+		// 登录页快捷切换：本机保存过账号就显示下拉（选择即恢复登录）
+		const sc = s.savedCount || 0;
+		const box = $('savedAcc');
+		if(sc > 0){
+			renderSavedList();
+			box.style.display = 'block';
+		} else {
+			box.style.display = 'none';
+		}
+	}
   // 日志
   if(s.logs !== lastLogs){
     lastLogs = s.logs;
