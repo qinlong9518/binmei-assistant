@@ -350,7 +350,7 @@ func main() {
 	http.HandleFunc("/api/toggle", toggleHandler)
 
 	addr := "127.0.0.1:8642"
-	logf("🖥 彬煤答题助手（电脑端）已启动: http://%s", addr)
+	logf("🖥 彬煤助手（电脑端）已启动: http://%s", addr)
 	go func() {
 		time.Sleep(500 * time.Millisecond)
 		openBrowser("http://" + addr)
