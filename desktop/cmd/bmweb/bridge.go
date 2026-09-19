@@ -66,15 +66,17 @@ type PtView struct {
 	IsMax bool    `json:"full"`
 }
 
+// StateView 前端状态视图（savedCount：本机保存的账号数，用于登录页快捷切换）
 type StateView struct {
-	LoggedIn bool     `json:"loggedIn"`
-	Name     string   `json:"name"`
-	Account  string   `json:"account"`
-	Running  bool     `json:"running"`
-	Task     string   `json:"task"`
-	Points   []PtView `json:"points"`
-	Logs     string   `json:"logs"`
-	Status   string   `json:"status"`
+	LoggedIn   bool     `json:"loggedIn"`
+	Name       string   `json:"name"`
+	Account    string   `json:"account"`
+	Running    bool     `json:"running"`
+	Task       string   `json:"task"`
+	Points     []PtView `json:"points"`
+	Logs       string   `json:"logs"`
+	Status     string   `json:"status"`
+	SavedCount int      `json:"savedCount"`
 }
 
 func buildState() StateView {
@@ -91,6 +93,7 @@ func buildState() StateView {
 		sv.Account = c.Account
 	}
 	sv.Running = rt.running
+	sv.SavedCount = len(cfg.Accounts)
 	for _, p := range rt.lastPts {
 		sv.Points = append(sv.Points, PtView{
 			Name: p.Name, Cur: p.Cur, Max: p.Max, IsMax: p.Cur >= p.Max,
@@ -155,6 +158,8 @@ func (b *App) Login(id string) string {
 	rt.mu.Lock()
 	rt.client = c
 	rt.mu.Unlock()
+	cfg.Last = id
+	saveConfig(cfg)
 	logf("✅ 登录成功: %s（%s）", c.Name, id)
 	return ""
 }
