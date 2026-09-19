@@ -58,7 +58,7 @@ func updateWatchdog() {
 }
 
 // startBackground 启动后台任务（startup 后调用）
-func startBackground(bridge *UIBridge) {
+func startBackground(bridge *App) {
 	go func() {
 		time.Sleep(2 * time.Second)
 		silentCheckUpdate()
