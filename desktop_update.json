@@ -1,7 +1,7 @@
 {
-  "versionCode": 16,
-  "versionName": "1.14.3",
-  "changelog": "更新自动覆盖安装（便携模式也生效）；登录后自动加载积分；账号弹窗新增退出登录",
-  "exeUrl": "https://github.com/qinlong9518/binmei-assistant/releases/latest/download/binmei-web.exe",
+  "versionCode": 17,
+  "versionName": "1.14.4",
+  "changelog": "仓库更名为 bmzs，程序内全部地址同步（官网/更新源/下载镜像）",
+  "exeUrl": "https://github.com/qinlong9518/bmzs/releases/latest/download/binmei-web.exe",
   "force": false
 }
