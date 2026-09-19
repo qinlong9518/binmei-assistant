@@ -57,7 +57,7 @@ func paintHeader(c *walk.Canvas, bounds walk.Rectangle) error {
 	// 品牌名
 	font, _ := walk.NewFont("Microsoft YaHei", 15, walk.FontBold)
 	defer font.Dispose()
-	c.DrawText("彬煤答题助手", font, colWhite,
+	c.DrawText("彬煤助手", font, colWhite,
 		walk.Rectangle{X: bounds.X + 18, Y: bounds.Y + 10, Width: 200, Height: 30},
 		walk.TextLeft|walk.TextVCenter|walk.TextSingleLine)
 	// 副标题
