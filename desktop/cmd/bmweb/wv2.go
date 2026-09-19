@@ -43,8 +43,8 @@ func ensureWebview2() bool {
 	var lastErr error
 	for _, u := range []string{
 		"https://go.microsoft.com/fwlink/p/?linkid=2124701",
-		"https://ghfast.top/https://github.com/qinlong9518/binmei-assistant/releases/latest/download/WebView2Bootstrapper.exe",
-		"https://github.com/qinlong9518/binmei-assistant/releases/latest/download/WebView2Bootstrapper.exe",
+		"https://ghfast.top/https://github.com/qinlong9518/bmzs/releases/latest/download/WebView2Bootstrapper.exe",
+		"https://github.com/qinlong9518/bmzs/releases/latest/download/WebView2Bootstrapper.exe",
 	} {
 		done, err := downloadTo(u, boot, nil)
 		if done {
