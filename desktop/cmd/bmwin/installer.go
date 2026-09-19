@@ -17,7 +17,7 @@ const (
 	appExeName    = "BinmeiAssistant.exe"
 	installSubDir = `Programs\BinmeiAssistant`
 	uninstallKey  = `Software\Microsoft\Windows\CurrentVersion\Uninstall\BinmeiAssistant`
-	lnkName       = `彬煤答题助手.lnk`
+	lnkName       = `彬煤助手.lnk`
 )
 
 func installDir() string {
@@ -50,7 +50,7 @@ func ensureInstalledFlow() bool {
 		return true
 	}
 	ans := walkMsgBoxYesNo("安装",
-		"是否将「彬煤答题助手」安装到电脑？\n\n"+
+		"是否将「彬煤助手」安装到电脑？\n\n"+
 			"· 安装到本地程序目录（无需管理员权限）\n"+
 			"· 创建桌面和开始菜单快捷方式\n"+
 			"· 之后可删除本安装包，程序独立运行\n"+
@@ -141,7 +141,7 @@ func writeUninstallEntry(dir string) error {
 	}
 	defer k.Close()
 	exe := filepath.Join(dir, appExeName)
-	k.SetStringValue("DisplayName", "彬煤答题助手")
+	k.SetStringValue("DisplayName", "彬煤助手")
 	k.SetStringValue("DisplayVersion", AppVersion)
 	k.SetStringValue("DisplayIcon", exe)
 	k.SetStringValue("UninstallString", exe+` /uninstall`)
@@ -159,7 +159,7 @@ func removeUninstallEntry() {
 
 // runUninstaller 卸载流程（bmmain /uninstall）
 func runUninstaller() {
-	if !walkMsgBoxYesNo("卸载确认", "确定要卸载「彬煤答题助手」吗？\n\n账号配置与本地数据将一并删除。") {
+	if !walkMsgBoxYesNo("卸载确认", "确定要卸载「彬煤助手」吗？\n\n账号配置与本地数据将一并删除。") {
 		return
 	}
 	removeShortcuts()
